@@ -1,0 +1,13 @@
+export enum Role {
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  SENDER = "SENDER",
+  RECEIVER = "RECEIVER",
+  DELIVERY_PERSONNEL = "DELIVERY_PERSONNEL",
+}
+
+export enum IsActive {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  BLOCKED = "BLOCKED",
+}
