@@ -13,7 +13,7 @@ export const senderSidebarItems: ISidebarItem[] = [
     items: [
       {
         title: "Send Parcel",
-        url: "",
+        url: "create-parcel",
         component: CreateParcel,
       },
       {

@@ -3,6 +3,7 @@
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
 
+const Analytics = lazy(() => import("@/pages/admin/analytics/Analytics"));
 const AllUsers = lazy(() => import("@/pages/admin/user/AllUsers"));
 const BlockUser = lazy(() => import("@/pages/admin/user/BlockUser"));
 const CreateDeliveryPersonnel = lazy(
@@ -18,6 +19,21 @@ const BlockParcel = lazy(() => import("@/pages/admin/parcels/BlockParcel"));
 const CreateParcel = lazy(() => import("@/pages/admin/parcels/CreateParcel"));
 
 export const adminSidebarItems: ISidebarItem[] = [
+  {
+    title: "Analytics",
+    items: [
+      {
+        title: "Parcels Statistics",
+        url: "/admin/analytics",
+        component: Analytics,
+      },
+      {
+        title: "User Statistics",
+        url: "/admin/user-statistics",
+        component: Analytics,
+      },
+    ],
+  },
   {
     title: "Users",
     items: [
