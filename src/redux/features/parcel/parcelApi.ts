@@ -107,5 +107,7 @@ export const {
   useTrackParcelQuery,
   useGetAllParcelsQuery,
   useAdminCreateParcelMutation,
-  useGetParcelDetailsQuery,
+  useGetParcelByIdQuery,
+  useUpdateStatusAndPersonnelMutation,
+  useBlockParcelMutation,
 } = parcelApi;
