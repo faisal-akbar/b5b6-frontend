@@ -41,6 +41,13 @@ export const userApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    updateUserById: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/user/${id}`,
+        method: "PATCH",
+        data,
+      }),
+    }),
     blockUserById: builder.mutation({
       query: (id) => ({
         url: `/user/${id}/block-user`,
