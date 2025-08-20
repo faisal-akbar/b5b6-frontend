@@ -11,17 +11,17 @@ export const receiverSidebarItems: ISidebarItem[] = [
     items: [
       {
         title: "Incoming Parcels",
-        url: "/parcels/me/incoming",
+        url: "me/incoming",
         component: IncomingParcels,
       },
       {
         title: "Delivery History",
-        url: "/parcels/me/history",
+        url: "me/history",
         component: DeliveryHistory,
       },
       {
         title: "Confirm Delivery",
-        url: "/parcels/confirm/:id",
+        url: "confirm/:id",
         component: ConfirmDelivery,
       },
     ],

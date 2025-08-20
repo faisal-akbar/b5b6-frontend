@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Password from "@/components/ui/Password";
 import { cn } from "@/lib/utils";
-import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import { useRegisterMutation } from "@/redux/features/user/userApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";

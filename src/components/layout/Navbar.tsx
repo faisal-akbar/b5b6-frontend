@@ -11,11 +11,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  authApi,
-  useLogoutMutation,
-  useUserInfoQuery,
-} from "@/redux/features/auth/authApi";
+import { authApi, useLogoutMutation } from "@/redux/features/auth/authApi";
+import { useGetMeQuery } from "@/redux/features/user/userApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { Role } from "@/types/user.type";
 import { Link } from "react-router";
@@ -32,7 +29,7 @@ const navigationLinks = [
 ];
 
 export default function Navbar() {
-  const { data } = useUserInfoQuery(undefined);
+  const { data } = useGetMeQuery(undefined);
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
 

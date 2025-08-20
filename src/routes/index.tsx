@@ -1,6 +1,7 @@
 import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import About from "@/pages/About";
+import HomePage from "@/pages/HomePage";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Unauthorized from "@/pages/Unauthorized";
@@ -20,25 +21,25 @@ export const router = createBrowserRouter([
     path: "/",
     children: [
       {
-        Component: Homepage,
+        Component: HomePage,
         index: true,
       },
       {
         Component: About,
         path: "about",
       },
-      {
-        Component: Tours,
-        path: "tours",
-      },
-      {
-        Component: TourDetails,
-        path: "tours/:id",
-      },
-      {
-        Component: withAuth(Booking),
-        path: "booking/:id",
-      },
+      // {
+      //   Component: Tours,
+      //   path: "tours",
+      // },
+      // {
+      //   Component: TourDetails,
+      //   path: "tours/:id",
+      // },
+      // {
+      //   Component: withAuth(Booking),
+      //   path: "booking/:id",
+      // },
     ],
   },
   {
@@ -53,7 +54,7 @@ export const router = createBrowserRouter([
     Component: withAuth(DashboardLayout, Role.SENDER as TRole),
     path: "/sender",
     children: [
-      { index: true, element: <Navigate to="/sender/bookings" /> },
+      { index: true, element: <Navigate to="/sender/parcels" /> },
       ...generateRoutes(senderSidebarItems),
     ],
   },
@@ -61,7 +62,7 @@ export const router = createBrowserRouter([
     Component: withAuth(DashboardLayout, Role.RECEIVER as TRole),
     path: "/receiver",
     children: [
-      { index: true, element: <Navigate to="/receiver/bookings" /> },
+      { index: true, element: <Navigate to="/receiver/parcels" /> },
       ...generateRoutes(receiverSidebarItems),
     ],
   },
@@ -80,13 +81,5 @@ export const router = createBrowserRouter([
   {
     Component: Unauthorized,
     path: "/unauthorized",
-  },
-  {
-    Component: Success,
-    path: "/payment/success",
-  },
-  {
-    Component: Fail,
-    path: "/payment/fail",
   },
 ]);

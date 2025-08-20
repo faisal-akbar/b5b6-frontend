@@ -13,27 +13,27 @@ export const senderSidebarItems: ISidebarItem[] = [
     items: [
       {
         title: "Send Parcel",
-        url: "/parcels",
+        url: "",
         component: CreateParcel,
       },
       {
         title: "Cancel Parcel",
-        url: "/parcels/cancel/:id",
+        url: "cancel/:id",
         component: CancelParcel,
       },
       {
         title: "Delete Parcel",
-        url: "/parcels/delete/:id",
+        url: "delete/:id",
         component: DeleteParcel,
       },
       {
         title: "Parcel Status",
-        url: "/parcels/:id/status-log",
+        url: ":id/status-log",
         component: ParcelStatus,
       },
       {
         title: "My Parcels",
-        url: "/parcels/me",
+        url: "me",
         component: MyParcels,
       },
     ],

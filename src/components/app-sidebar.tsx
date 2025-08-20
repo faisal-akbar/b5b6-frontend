@@ -11,13 +11,13 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useUserInfoQuery } from "@/redux/features/auth/authApi";
+import { useGetMeQuery } from "@/redux/features/user/userApi";
 import { getSidebarItems } from "@/utils/getSidebarItems";
 import * as React from "react";
 import { Link } from "react-router";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: userData } = useUserInfoQuery(undefined);
+  const { data: userData } = useGetMeQuery(undefined);
 
   const data = {
     navMain: getSidebarItems(userData?.data?.role),
