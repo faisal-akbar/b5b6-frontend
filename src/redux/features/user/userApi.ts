@@ -9,15 +9,15 @@ export const userApi = baseApi.injectEndpoints({
         data,
       }),
     }),
-    getAllUsers: builder.query({
-      query: () => ({
-        url: "/users/all-users",
-        method: "GET",
-      }),
-    }),
     getMe: builder.query({
       query: () => ({
         url: "/user/me",
+        method: "GET",
+      }),
+    }),
+    getAllUsers: builder.query({
+      query: () => ({
+        url: "/users/all-users",
         method: "GET",
       }),
     }),

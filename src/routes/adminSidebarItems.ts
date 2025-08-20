@@ -1,21 +1,23 @@
 // import Analytics from "@/pages/Admin/Analytics";
+
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
 
-const AllUsers = lazy(() => import("@/pages/admin/AllUsers"));
-const BlockUser = lazy(() => import("@/pages/admin/BlockUser"));
+const AllUsers = lazy(() => import("@/pages/admin/user/AllUsers"));
+const BlockUser = lazy(() => import("@/pages/admin/user/BlockUser"));
+const CreateDeliveryPersonnel = lazy(
+  () => import("@/pages/admin/user/CreateDeliveryPersonnel")
+);
+const CreateAdmin = lazy(() => import("@/pages/admin/user/CreateAdmin"));
+const ViewParcels = lazy(() => import("@/pages/admin/parcels/ViewParcels"));
+const ViewParcel = lazy(() => import("@/pages/admin/parcels/ViewParcel"));
+const UpdateDeliveryStatus = lazy(
+  () => import("@/pages/admin/parcels/UpdateDeliveryStatus")
+);
+const BlockParcel = lazy(() => import("@/pages/admin/parcels/BlockParcel"));
+const CreateParcel = lazy(() => import("@/pages/admin/parcels/CreateParcel"));
 
 export const adminSidebarItems: ISidebarItem[] = [
-  // {
-  //   title: "Dashboard",
-  //   items: [
-  //     {
-  //       title: "Users",
-  //       url: "/admin/all-users",
-  //       component: Analytics,
-  //     },
-  //   ],
-  // },
   {
     title: "Users",
     items: [
@@ -25,19 +27,24 @@ export const adminSidebarItems: ISidebarItem[] = [
         component: AllUsers,
       },
       {
+        title: "View User",
+        url: "/admin/user/:id",
+        component: AllUsers,
+      },
+      {
         title: "Block User",
         url: "/admin/block-user",
         component: BlockUser,
       },
       {
-        title: "Create Admin",
-        url: "/admin/create-admin",
-        component: CreateAdmin,
-      },
-      {
         title: "Create Delivery Personnel",
         url: "/admin/create-delivery-personnel",
         component: CreateDeliveryPersonnel,
+      },
+      {
+        title: "Create Admin",
+        url: "/admin/create-admin",
+        component: CreateAdmin,
       },
     ],
   },
@@ -47,27 +54,27 @@ export const adminSidebarItems: ISidebarItem[] = [
       {
         title: "View All Parcels",
         url: "/admin/parcels",
+        component: ViewParcels,
+      },
+      {
+        title: "View Parcel",
+        url: "/admin/parcels/:id",
         component: ViewParcel,
       },
       {
-        title: "Create Parcel",
-        url: "/admin/create-parcel",
-        component: CreateParcel,
-      },
-      {
         title: "Update Delivery Status",
-        url: "/admin/update-delivery-status",
+        url: "/admin/parcels/:id/delivery-status",
         component: UpdateDeliveryStatus,
       },
       {
-        title: "Update Block Status",
-        url: "/admin/update-block-status",
-        component: UpdateBlockStatus,
+        title: "Block Parcel",
+        url: "/admin/parcels/:id/block-status",
+        component: BlockParcel,
       },
       {
-        title: "Parcel Details",
-        url: "/admin/parcel-details",
-        component: ParcelDetails,
+        title: "Create Parcel",
+        url: "/admin/parcels/create-parcel",
+        component: CreateParcel,
       },
     ],
   },
