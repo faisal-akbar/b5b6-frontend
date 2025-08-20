@@ -1,39 +1,40 @@
-import Bookings from "@/pages/User/Bookings";
 import type { ISidebarItem } from "@/types";
+import { lazy } from "react";
+
+const CreateParcel = lazy(() => import("@/pages/sender/CreateParcel"));
+const CancelParcel = lazy(() => import("@/pages/sender/CancelParcel"));
+const DeleteParcel = lazy(() => import("@/pages/sender/DeleteParcel"));
+const MyParcels = lazy(() => import("@/pages/sender/MyParcels"));
+const ParcelStatus = lazy(() => import("@/pages/sender/ParcelStatus"));
 
 export const senderSidebarItems: ISidebarItem[] = [
   {
     title: "Parcels",
     items: [
       {
-        title: "Create Parcel",
-        url: "/user/create-parcel",
+        title: "Send Parcel",
+        url: "/parcels",
         component: CreateParcel,
       },
       {
         title: "Cancel Parcel",
-        url: "/user/cancel-parcel",
+        url: "/parcels/cancel/:id",
         component: CancelParcel,
       },
       {
         title: "Delete Parcel",
-        url: "/user/delete-parcel",
+        url: "/parcels/delete/:id",
         component: DeleteParcel,
       },
       {
+        title: "Parcel Status",
+        url: "/parcels/:id/status-log",
+        component: ParcelStatus,
+      },
+      {
         title: "My Parcels",
-        url: "/user/my-parcels",
+        url: "/parcels/me",
         component: MyParcels,
-      },
-      {
-        title: "Parcel History",
-        url: "/user/parcel-history",
-        component: ParcelHistory,
-      },
-      {
-        title: "Bookings",
-        url: "/user/bookings",
-        component: Bookings,
       },
     ],
   },
