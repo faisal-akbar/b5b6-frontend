@@ -1,5 +1,6 @@
 import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import NotFound from "@/components/NotFound";
 import About from "@/pages/About";
 import HomePage from "@/pages/HomePage";
 import Login from "@/pages/Login";
@@ -12,7 +13,7 @@ import { generateRoutes } from "@/utils/generateRoutes";
 import { withAuth } from "@/utils/withAuth";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarItems } from "./adminSidebarItems";
-import { receiverSidebarItems } from "./recevierSidebarItems";
+import { receiverSidebarItems } from "./receiverSidebarItems";
 import { senderSidebarItems } from "./senderSidebarItems";
 
 export const router = createBrowserRouter([
@@ -81,5 +82,9 @@ export const router = createBrowserRouter([
   {
     Component: Unauthorized,
     path: "/unauthorized",
+  },
+  {
+    path: "*",
+    Component: NotFound,
   },
 ]);
