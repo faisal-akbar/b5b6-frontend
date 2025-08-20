@@ -1,10 +1,9 @@
-import AddTour from "@/pages/Admin/AddTour";
-import AddTourType from "@/pages/Admin/AddTourType";
 // import Analytics from "@/pages/Admin/Analytics";
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
 
-const Analytics = lazy(() => import("@/pages/Admin/Analytics"));
+const AllUsers = lazy(() => import("@/pages/admin/AllUsers"));
+const BlockUser = lazy(() => import("@/pages/admin/BlockUser"));
 
 export const adminSidebarItems: ISidebarItem[] = [
   // {
@@ -23,17 +22,22 @@ export const adminSidebarItems: ISidebarItem[] = [
       {
         title: "View All Users",
         url: "/admin/all-users",
-        component: AddTourType,
+        component: AllUsers,
       },
       {
         title: "Block User",
         url: "/admin/block-user",
-        component: AddTour,
+        component: BlockUser,
       },
       {
-        title: "Habi Jabi",
-        url: "/admin/habijabi",
-        component: AddTour,
+        title: "Create Admin",
+        url: "/admin/create-admin",
+        component: CreateAdmin,
+      },
+      {
+        title: "Create Delivery Personnel",
+        url: "/admin/create-delivery-personnel",
+        component: CreateDeliveryPersonnel,
       },
     ],
   },

@@ -1,11 +1,11 @@
-import { useUserInfoQuery } from "@/redux/features/auth/authApi";
+import { useGetMeQuery } from "@/redux/features/user/userApi";
 import type { TRole } from "@/types";
 import type { ComponentType } from "react";
 import { Navigate } from "react-router";
 
 export const withAuth = (Component: ComponentType, requiredRole?: TRole) => {
   return function AuthWrapper() {
-    const { data, isLoading } = useUserInfoQuery(undefined);
+    const { data, isLoading } = useGetMeQuery(undefined);
 
     if (!isLoading && !data?.data?.email) {
       return <Navigate to="/login" />;
