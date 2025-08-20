@@ -2,6 +2,7 @@ import { baseApi } from "@/redux/api/baseApi";
 
 export const parcelApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Sender
     createParcel: builder.mutation({
       query: (data) => ({
         url: "/parcels",
@@ -21,18 +22,19 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
-    getSenderParcels: builder.query({
-      query: () => ({
-        url: "/parcels/me",
-        method: "GET",
-      }),
-    }),
     getParcelStatusLog: builder.query({
       query: (id) => ({
         url: `/parcels/${id}/status-log`,
         method: "GET",
       }),
     }),
+    getSenderParcels: builder.query({
+      query: () => ({
+        url: "/parcels/me",
+        method: "GET",
+      }),
+    }),
+    // Receiver
     getIncomingParcels: builder.query({
       query: () => ({
         url: "/parcels/me/incoming",
@@ -45,16 +47,36 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    trackParcel: builder.query({
-      query: (trackingId) => ({
-        url: `/parcels/tracking/${trackingId}`,
-        method: "GET",
+    confirmParcelDelivery: builder.mutation({
+      query: (id) => ({
+        url: `/parcels/confirm/${id}`,
+        method: "POST",
       }),
     }),
+    // admin
     getAllParcels: builder.query({
       query: () => ({
         url: "/parcels",
         method: "GET",
+      }),
+    }),
+    getParcelById: builder.query({
+      query: (id) => ({
+        url: `/parcels/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateStatusAndPersonnel: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/parcels/${id}/delivery-status`,
+        method: "PATCH",
+        data,
+      }),
+    }),
+    blockParcel: builder.mutation({
+      query: (id) => ({
+        url: `/parcels/${id}/block-status`,
+        method: "PATCH",
       }),
     }),
     adminCreateParcel: builder.mutation({
@@ -64,9 +86,10 @@ export const parcelApi = baseApi.injectEndpoints({
         data,
       }),
     }),
-    getParcelDetails: builder.query({
-      query: (id) => ({
-        url: `/parcels/${id}/details`,
+    // public
+    trackParcel: builder.query({
+      query: (trackingId) => ({
+        url: `/parcels/tracking/${trackingId}`,
         method: "GET",
       }),
     }),
