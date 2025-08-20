@@ -2,6 +2,7 @@ import Logo from "@/assets/icons/Logo";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -15,9 +16,18 @@ import { useGetMeQuery } from "@/redux/features/user/userApi";
 import { getSidebarItems } from "@/utils/getSidebarItems";
 import * as React from "react";
 import { Link } from "react-router";
+import { NavUser } from "./ui/nav-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: userData } = useGetMeQuery(undefined);
+  const { data: userData, isLoading, isError } = useGetMeQuery(undefined);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading user data</div>;
+  }
 
   const data = {
     navMain: getSidebarItems(userData?.data?.role),
@@ -50,6 +60,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarRail />
+      <SidebarFooter>
+        <NavUser user={userData?.data} />
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -83,5 +83,3 @@ export const router = createBrowserRouter([
     path: "/unauthorized",
   },
 ]);
-
-console.log("Routes have been generated", router);
