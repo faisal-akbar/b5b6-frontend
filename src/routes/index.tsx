@@ -1,17 +1,17 @@
 import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { role } from "@/constants/role";
 import About from "@/pages/About";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Unauthorized from "@/pages/Unauthorized";
 import Verify from "@/pages/Verify";
+import { TRole } from "@/types";
 import { generateRoutes } from "@/utils/generateRoutes";
+import { withAuth } from "@/utils/withAuth";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarItems } from "./adminSidebarItems";
-import { userSidebarItems } from "./userSidebarItems";
-import { withAuth } from "@/utils/withAuth";
-import Unauthorized from "@/pages/Unauthorized";
-import { role } from "@/constants/role";
-import { TRole } from "@/types";
+import { userSidebarItems } from "./recevierSidebarItems";
 
 export const router = createBrowserRouter([
   {

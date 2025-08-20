@@ -1,5 +1,5 @@
 import { adminSidebarItems } from "@/routes/adminSidebarItems";
-import { userSidebarItems } from "@/routes/userSidebarItems";
+import { userSidebarItems } from "@/routes/recevierSidebarItems";
 import type { TRole } from "@/types";
 import { Role } from "@/types/user.type";
 
