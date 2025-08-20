@@ -9,15 +9,15 @@ export const authApi = baseApi.injectEndpoints({
         data,
       }),
     }),
-    refreshToken: builder.mutation({
-      query: () => ({
-        url: "/auth/refresh-token",
-        method: "POST",
-      }),
-    }),
     logout: builder.mutation({
       query: () => ({
         url: "/auth/logout",
+        method: "POST",
+      }),
+    }),
+    refreshToken: builder.mutation({
+      query: () => ({
+        url: "/auth/refresh-token",
         method: "POST",
       }),
     }),
@@ -44,14 +44,14 @@ export const authApi = baseApi.injectEndpoints({
     }),
     sendOtp: builder.mutation({
       query: (data) => ({
-        url: "/auth/send",
+        url: "/otp/send",
         method: "POST",
         data,
       }),
     }),
     verifyOtp: builder.mutation({
       query: (data) => ({
-        url: "/auth/verify",
+        url: "/otp/verify",
         method: "POST",
         data,
       }),
@@ -68,5 +68,4 @@ export const {
   useResetPasswordMutation,
   useSendOtpMutation,
   useVerifyOtpMutation,
-  useRegisterMutation,
 } = authApi;
