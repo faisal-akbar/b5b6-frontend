@@ -94,7 +94,7 @@ export default function Navbar() {
             </PopoverContent>
           </Popover>
           {/* Main nav */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
             <Link to="/" className="text-primary hover:text-primary/90">
               <Logo />
             </Link>

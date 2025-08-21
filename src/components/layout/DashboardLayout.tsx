@@ -6,6 +6,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Outlet } from "react-router";
+import { ModeToggle } from "./ModeToggle";
 
 export default function DashboardLayout() {
   return (
@@ -18,6 +19,9 @@ export default function DashboardLayout() {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
+          <div className="ml-auto flex items-center gap-2">
+            <ModeToggle />
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
           <Outlet />
