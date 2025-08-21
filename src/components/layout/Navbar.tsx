@@ -16,6 +16,7 @@ import { useGetMeQuery } from "@/redux/features/user/userApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { Role } from "@/types/user.type";
 import { Link } from "react-router";
+import { Fragment } from "react/jsx-runtime";
 import { ModeToggle } from "./ModeToggle";
 
 // Navigation links array to be used in both desktop and mobile menus
@@ -93,17 +94,17 @@ export default function Navbar() {
             </PopoverContent>
           </Popover>
           {/* Main nav */}
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-primary hover:text-primary/90">
+          <div className="flex items-center">
+            <Link to="/" className="text-primary hover:text-primary/90">
               <Logo />
-            </a>
+            </Link>
             {/* Navigation menu */}
             <NavigationMenu className="max-md:hidden">
               <NavigationMenuList className="gap-2">
                 {navigationLinks.map((link, index) => (
-                  <>
+                  <Fragment key={index}>
                     {link.role === "PUBLIC" && (
-                      <NavigationMenuItem key={index}>
+                      <NavigationMenuItem>
                         <NavigationMenuLink
                           asChild
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium"
@@ -113,7 +114,7 @@ export default function Navbar() {
                       </NavigationMenuItem>
                     )}
                     {link.role === data?.data?.role && (
-                      <NavigationMenuItem key={index}>
+                      <NavigationMenuItem>
                         <NavigationMenuLink
                           asChild
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium"
@@ -122,7 +123,7 @@ export default function Navbar() {
                         </NavigationMenuLink>
                       </NavigationMenuItem>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </NavigationMenuList>
             </NavigationMenu>

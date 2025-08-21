@@ -22,8 +22,8 @@ export function LoginForm({
   const form = useForm({
     //! For development only
     defaultValues: {
-      email: "mirhussainmurtaza@gmail.com",
-      password: "12345678",
+      email: "faisalmis13@gmail.com",
+      password: "Ph@12345678",
     },
   });
   const [login] = useLoginMutation();
@@ -48,7 +48,7 @@ export function LoginForm({
 
       if (err?.data.message === "User is not verified") {
         toast.error("Your account is not verified");
-        navigate("/verify", { state: data.email });
+        navigate("/verify", { state: { email: data.email } });
       }
     }
   };

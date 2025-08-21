@@ -43,7 +43,7 @@ const FormSchema = z.object({
 export default function Verify() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [email] = useState(location.state);
+  const { email } = location.state || {};
   const [confirmed, setConfirmed] = useState(false);
   const [sendOtp] = useSendOtpMutation();
   const [verifyOtp] = useVerifyOtpMutation();
@@ -63,12 +63,12 @@ export default function Verify() {
       const res = await sendOtp({ email: email }).unwrap();
 
       if (res.success) {
-        toast.success("OTP Sent", { id: toastId });
+        toast.success("OTP has been sent", { id: toastId });
         setConfirmed(true);
         setTimer(5);
       }
     } catch (err) {
-      console.log(err);
+      toast.error(err?.data?.message, { id: toastId });
     }
   };
 
@@ -85,17 +85,17 @@ export default function Verify() {
         toast.success("OTP Verified", { id: toastId });
         setConfirmed(true);
       }
+      navigate("/login");
     } catch (err) {
-      console.log(err);
+      toast.error(err?.data?.message, { id: toastId });
     }
   };
 
-  //! Needed - Turned off for development
-  //   useEffect(() => {
-  //     if (!email) {
-  //       navigate("/");
-  //     }
-  //   }, [email]);
+  useEffect(() => {
+    if (!email) {
+      navigate("/");
+    }
+  }, [navigate, email]);
 
   useEffect(() => {
     if (!email || !confirmed) {
@@ -166,7 +166,7 @@ export default function Verify() {
                             "text-gray-500": timer !== 0,
                           })}
                         >
-                          Resent OPT:{" "}
+                          Resend OTP:{" "}
                         </Button>{" "}
                         {timer}
                       </FormDescription>
