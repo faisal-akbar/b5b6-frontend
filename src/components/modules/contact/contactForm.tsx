@@ -1,4 +1,6 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -10,8 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail, MessageSquare, Phone, User } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
+import ContactHero from "./ContactHero";
 
 const contactSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -35,95 +41,160 @@ export default function ContactForm() {
     },
   });
 
+  const [loading, setLoading] = useState(false);
+
   function onSubmit(values: ContactFormValues) {
-    // You can integrate with Formspree or any API here
-    // For demo, just log values
-    console.log(values);
+    setLoading(true);
+    // Simulate email sending with a Promise
+    new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+      setLoading(false);
+      toast.success("Message sent successfully!");
+      form.reset();
+    });
   }
 
   return (
-    <div className="mx-auto max-w-2xl py-8">
-      <h2 className="mb-6 text-center text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100">
-        Contact
-      </h2>
-      <p className="mb-6 text-center text-lg text-neutral-900 dark:text-neutral-100">
-        Have a question for me? My direct messages are open
-        <a
-          href="https://twitter.com/_faisal_akbar"
-          className="font-bold text-sky-800 dark:text-sky-500 ml-1"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          on Twitter
-        </a>
-        for short and succinct messages.
-      </p>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Email address{" "}
-                  <small className="text-base">(will remain private)</small>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="you@example.com"
-                    {...field}
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <ContactHero />
+      {/* Contact Form Section */}
+      <section className="py-20 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-background"></div>
+        <div className="relative max-w-4xl mx-auto px-4">
+          <Card className="p-8 shadow-xl border-0 bg-gradient-to-br from-card to-card/50">
+            <CardHeader className="text-center mb-8">
+              <Badge variant="outline" className="mb-4 w-fit mx-auto">
+                Send Message
+              </Badge>
+              <CardTitle className="text-3xl md:text-4xl font-black tracking-tight">
+                Contact Form
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Your Name"
+                              {...field}
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            Email address
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="you@example.com"
+                              {...field}
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4" />
+                          Message
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            rows={6}
+                            placeholder="Tell us how we can help you..."
+                            {...field}
+                            className="resize-none"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Message</FormLabel>
-                <FormControl>
-                  <Textarea rows={6} placeholder="Your message..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="source"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>How’d you hear about my website?</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. Searching the web" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" className="w-full text-lg py-4">
-            Send message
-          </Button>
-        </form>
-      </Form>
+
+                  <FormField
+                    control={form.control}
+                    name="source"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>How'd you hear about us?</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. Searching the web, Social media, Friend recommendation"
+                            {...field}
+                            className="h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full text-lg py-6 flex items-center justify-center gap-2"
+                    disabled={loading}
+                  >
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8z"
+                        ></path>
+                      </svg>
+                    )}
+                    {loading ? "Sending..." : "Send Message"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
   );
 }

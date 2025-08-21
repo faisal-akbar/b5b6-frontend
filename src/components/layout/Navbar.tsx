@@ -22,11 +22,16 @@ import { ModeToggle } from "./ModeToggle";
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
   { href: "/", label: "Home", role: "PUBLIC" },
+  { href: "/features", label: "Features", role: "PUBLIC" },
+  { href: "/testimonials", label: "Testimonials", role: "PUBLIC" },
+  { href: "/trackparcel", label: "Track Parcel", role: "PUBLIC" },
+  { href: "/faq", label: "FAQ", role: "PUBLIC" },
   { href: "/about", label: "About", role: "PUBLIC" },
-  { href: "/admin", label: "Dashboard", role: Role.ADMIN },
-  { href: "/admin", label: "Dashboard", role: Role.SUPER_ADMIN },
-  { href: "/sender", label: "Dashboard", role: Role.SENDER },
-  { href: "/receiver", label: "Dashboard", role: Role.RECEIVER },
+  { href: "/contact", label: "Contact", role: "PUBLIC" },
+  { href: "/admin/analytics", label: "Dashboard", role: Role.ADMIN },
+  { href: "/admin/analytics", label: "Dashboard", role: Role.SUPER_ADMIN },
+  { href: "/sender/create-parcel", label: "Dashboard", role: Role.SENDER },
+  { href: "/receiver/me/incoming", label: "Dashboard", role: Role.RECEIVER },
 ];
 
 export default function Navbar() {

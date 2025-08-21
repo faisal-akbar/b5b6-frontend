@@ -38,7 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <Link to="/" className="flex items-center gap-2">
           <Logo />
-          <span>Parcel Delivery</span>
+          <span>NextLevel Parcel</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>

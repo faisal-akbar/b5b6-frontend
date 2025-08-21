@@ -2,9 +2,14 @@ import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import NotFound from "@/components/NotFound";
 import About from "@/pages/About";
+import Contact from "@/pages/Contact";
+import FAQ from "@/pages/FAQ";
+import Features from "@/pages/Features";
 import HomePage from "@/pages/HomePage";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Testimonials from "@/pages/Testimonials";
+import TrackParcel from "@/pages/TrackParcel";
 import Unauthorized from "@/pages/Unauthorized";
 import Verify from "@/pages/Verify";
 import type { TRole } from "@/types";
@@ -29,18 +34,26 @@ export const router = createBrowserRouter([
         Component: About,
         path: "about",
       },
-      // {
-      //   Component: Tours,
-      //   path: "tours",
-      // },
-      // {
-      //   Component: TourDetails,
-      //   path: "tours/:id",
-      // },
-      // {
-      //   Component: withAuth(Booking),
-      //   path: "booking/:id",
-      // },
+      {
+        Component: Contact,
+        path: "contact",
+      },
+      {
+        Component: Features,
+        path: "features",
+      },
+      {
+        Component: Testimonials,
+        path: "testimonials",
+      },
+      {
+        Component: TrackParcel,
+        path: "trackparcel",
+      },
+      {
+        Component: FAQ,
+        path: "faq",
+      },
     ],
   },
   {
