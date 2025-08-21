@@ -10,9 +10,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, MessageSquare, Phone, User } from "lucide-react";
+import { Mail, MessageSquare, User } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -55,9 +56,7 @@ export default function ContactForm() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
       <ContactHero />
-      {/* Contact Form Section */}
       <section className="py-20 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-background"></div>
         <div className="relative max-w-4xl mx-auto px-4">
@@ -166,28 +165,13 @@ export default function ContactForm() {
                     disabled={loading}
                   >
                     {loading && (
-                      <svg
-                        className="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8z"
-                        ></path>
-                      </svg>
+                      <Spinner className="mt-1" variant={"circle-filled"} />
                     )}
-                    {loading ? "Sending..." : "Send Message"}
+                    {loading ? (
+                      <span>Sending...</span>
+                    ) : (
+                      <span>Send Message</span>
+                    )}
                   </Button>
                 </form>
               </Form>
