@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useRegisterMutation } from "@/redux/features/user/userApi";
-import { Role } from "@/types/user.type";
+import { Role } from "@/types/user-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";

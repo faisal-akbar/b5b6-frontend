@@ -2,7 +2,7 @@ import { adminSidebarItems } from "@/routes/adminSidebarItems";
 import { receiverSidebarItems } from "@/routes/receiverSidebarItems";
 import { senderSidebarItems } from "@/routes/senderSidebarItems";
 import type { TRole } from "@/types";
-import { Role } from "@/types/user.type";
+import { Role } from "@/types/user-type";
 
 export const getSidebarItems = (userRole: TRole) => {
   switch (userRole) {

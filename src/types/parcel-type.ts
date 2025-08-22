@@ -1,10 +1,3 @@
-export interface IParcelTrackResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  data: IParcelTrackData;
-}
-
 export interface IParcelTrackData {
   trackingId: string;
   currentStatus: string;

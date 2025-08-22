@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IParcelTrackResponse } from "@/types/parcel.type";
+import { IParcelTrackData, IResponse } from "@/types";
 import { Package } from "lucide-react";
 import TimeLine from "./TimeLine";
 
@@ -33,7 +33,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const ParcelDetails = ({ data }: { data: IParcelTrackResponse }) => {
+const ParcelDetails = ({ data }: { data: IResponse<IParcelTrackData> }) => {
   const {
     trackingId,
     currentStatus,

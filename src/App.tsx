@@ -1,11 +1,14 @@
 import { Outlet } from "react-router";
+import ErrorBoundary from "./components/ErrorBoundary";
 import CommonLayout from "./components/layout/CommonLayout";
 
 function App() {
   return (
-    <CommonLayout>
-      <Outlet />
-    </CommonLayout>
+    <ErrorBoundary>
+      <CommonLayout>
+        <Outlet />
+      </CommonLayout>
+    </ErrorBoundary>
   );
 }
 

@@ -1,4 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
+import { IParcelTrackData, IResponse, ISenderParcel } from "@/types";
 
 export const parcelApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -28,7 +29,7 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    getSenderParcels: builder.query({
+    getSenderParcels: builder.query<IResponse<ISenderParcel[]>, void>({
       query: () => ({
         url: "/parcels/me",
         method: "GET",
@@ -87,7 +88,7 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
     }),
     // public
-    trackParcel: builder.query({
+    trackParcel: builder.query<IResponse<IParcelTrackData>, string>({
       query: (trackingId) => ({
         url: `/parcels/tracking/${trackingId}`,
         method: "GET",

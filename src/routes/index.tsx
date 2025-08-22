@@ -13,7 +13,7 @@ import TrackParcel from "@/pages/TrackParcel";
 import Unauthorized from "@/pages/Unauthorized";
 import Verify from "@/pages/Verify";
 import type { TRole } from "@/types";
-import { Role } from "@/types/user.type";
+import { Role } from "@/types/user-type";
 import { generateRoutes } from "@/utils/generateRoutes";
 import { withAuth } from "@/utils/withAuth";
 import { createBrowserRouter, Navigate } from "react-router";

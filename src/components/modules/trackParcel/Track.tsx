@@ -1,6 +1,6 @@
 import { parcelApi } from "@/redux/features/parcel/parcelApi";
 import { useAppDispatch } from "@/redux/hooks";
-import { IParcelTrackResponse } from "@/types/parcel.type";
+import { IParcelTrackData, IResponse } from "@/types";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ function Track() {
   const trackingId = searchParams.get("trackingId") || undefined;
   const dispatch = useAppDispatch();
 
-  const [data, setData] = useState<IParcelTrackResponse | null>(null);
+  const [data, setData] = useState<IResponse<IParcelTrackData> | null>(null);
 
   const [fetchState, setFetchState] = useState<{
     isLoading: boolean;
