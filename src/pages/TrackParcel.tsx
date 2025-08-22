@@ -1,15 +1,9 @@
-import {
-  HelpSection,
-  ParcelDetails,
-  TrackParcelHero,
-} from "@/components/modules/trackParcel";
+import Track from "@/components/modules/trackParcel/Track";
 
 export default function TrackParcel() {
   return (
     <div className="min-h-screen bg-background">
-      <TrackParcelHero />
-      <ParcelDetails />
-      <HelpSection />
+      <Track />
     </div>
   );
 }

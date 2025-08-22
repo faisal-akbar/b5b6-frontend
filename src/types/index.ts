@@ -2,6 +2,11 @@ import type { ComponentType } from "react";
 import type { Role } from "./user.type";
 
 export type { ILogin, ISendOtp, IVerifyOtp } from "./auth.type";
+export type {
+  ParcelTrackData,
+  ParcelTrackResponse,
+  StatusLog,
+} from "./parcel.type";
 
 export interface IResponse<T> {
   statusCode: number;

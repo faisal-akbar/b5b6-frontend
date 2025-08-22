@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusLog } from "@/types";
 import {
   CheckCircle,
   Clock,
@@ -8,38 +9,36 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
-import { parcelData } from "./mockData";
 
-const TimeLine = () => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Delivered":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case "In-Transit":
-        return <Truck className="w-5 h-5 text-blue-500" />;
-      case "Dispatched":
-        return <Truck className="w-5 h-5 text-purple-500" />;
-      case "Picked":
-        return <Package className="w-5 h-5 text-orange-500" />;
-      case "Approved":
-        return <CheckCircle className="w-5 h-5 text-yellow-500" />;
-      case "Requested":
-        return <Clock className="w-5 h-5 text-gray-500" />;
-      case "Rescheduled":
-        return <Clock className="w-5 h-5 text-indigo-500" />;
-      case "Returned":
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      case "Cancelled":
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      case "Blocked":
-        return <Shield className="w-5 h-5 text-red-500" />;
-      case "Flagged":
-        return <Flag className="w-5 h-5 text-yellow-500" />;
-      default:
-        return <Package className="w-5 h-5 text-gray-500" />;
-    }
-  };
-
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "Delivered":
+      return <CheckCircle className="w-5 h-5 text-green-500" />;
+    case "In-Transit":
+      return <Truck className="w-5 h-5 text-blue-500" />;
+    case "Dispatched":
+      return <Truck className="w-5 h-5 text-purple-500" />;
+    case "Picked":
+      return <Package className="w-5 h-5 text-orange-500" />;
+    case "Approved":
+      return <CheckCircle className="w-5 h-5 text-yellow-500" />;
+    case "Requested":
+      return <Clock className="w-5 h-5 text-gray-500" />;
+    case "Rescheduled":
+      return <Clock className="w-5 h-5 text-indigo-500" />;
+    case "Returned":
+      return <XCircle className="w-5 h-5 text-red-500" />;
+    case "Cancelled":
+      return <XCircle className="w-5 h-5 text-red-500" />;
+    case "Blocked":
+      return <Shield className="w-5 h-5 text-red-500" />;
+    case "Flagged":
+      return <Flag className="w-5 h-5 text-yellow-500" />;
+    default:
+      return <Package className="w-5 h-5 text-gray-500" />;
+  }
+};
+const TimeLine = ({ statusLog }: { statusLog: StatusLog[] }) => {
   return (
     <div className="lg:col-span-2">
       <Card className="p-6 shadow-lg border-0 bg-gradient-to-br from-card to-card/50">
@@ -48,19 +47,21 @@ const TimeLine = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {parcelData.statusLog.map((item, index) => (
+            {statusLog.map((item, index) => (
               <div key={index} className="flex gap-4">
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     {getStatusIcon(item.status)}
                   </div>
-                  {index < parcelData.statusLog.length - 1 && (
+                  {index < statusLog.length - 1 && (
                     <div className="w-0.5 h-12 bg-muted mt-2"></div>
                   )}
                 </div>
                 <div className="flex-1 pb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">{item.status}</h4>
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                    <h4 className="font-semibold mb-2 md:mb-0">
+                      {item.status}
+                    </h4>
                     <span className="text-sm text-muted-foreground">
                       {new Date(item.updatedAt).toLocaleString()}
                     </span>

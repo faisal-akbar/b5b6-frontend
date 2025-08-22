@@ -1,7 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import TrackParcelForm from "./TrackParcelForm";
 
-export default function TrackParcelHero() {
+export interface ITrackParcelProps {
+  isLoading: boolean;
+}
+
+export default function TrackParcelHero({ isLoading }: ITrackParcelProps) {
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background"></div>
@@ -19,7 +23,7 @@ export default function TrackParcelHero() {
             journey
           </p>
         </div>
-        <TrackParcelForm />
+        <TrackParcelForm isLoading={isLoading} />
       </div>
     </section>
   );
