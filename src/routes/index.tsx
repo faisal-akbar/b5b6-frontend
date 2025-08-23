@@ -8,6 +8,7 @@ import Features from "@/pages/Features";
 import HomePage from "@/pages/HomePage";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import ParcelStatus from "@/pages/sender/ParcelStatus";
 import Testimonials from "@/pages/Testimonials";
 import TrackParcel from "@/pages/TrackParcel";
 import Unauthorized from "@/pages/Unauthorized";
@@ -68,8 +69,9 @@ export const router = createBrowserRouter([
     Component: withAuth(DashboardLayout, Role.SENDER as TRole),
     path: "/sender",
     children: [
-      { index: true, element: <Navigate to="/sender/create-parcel" /> },
+      { index: true, element: <Navigate to="/sender/me" /> },
       ...generateRoutes(senderSidebarItems),
+      { Component: ParcelStatus, path: ":id/status" },
     ],
   },
   {

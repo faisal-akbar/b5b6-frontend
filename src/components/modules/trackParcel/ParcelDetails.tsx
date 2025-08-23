@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IParcelTrackData, IResponse } from "@/types";
 import { getStatusColor } from "@/utils/getStatusColor";
+import { format } from "date-fns";
 import { Package } from "lucide-react";
 import TimeLine from "./TimeLine";
 
@@ -55,7 +56,10 @@ const ParcelDetails = ({ data }: { data: IResponse<IParcelTrackData> }) => {
                     Estimated Delivery
                   </p>
                   <p className="font-semibold">
-                    {new Date(estimatedDelivery).toLocaleDateString()}
+                    {format(
+                      new Date(estimatedDelivery).toLocaleDateString(),
+                      "PP"
+                    )}
                   </p>
                 </div>
                 {deliveredAt && (
@@ -64,7 +68,7 @@ const ParcelDetails = ({ data }: { data: IResponse<IParcelTrackData> }) => {
                       Delivered At
                     </p>
                     <p className="font-semibold">
-                      {new Date(deliveredAt).toLocaleDateString()}
+                      {format(new Date(deliveredAt).toLocaleDateString(), "PP")}
                     </p>
                   </div>
                 )}

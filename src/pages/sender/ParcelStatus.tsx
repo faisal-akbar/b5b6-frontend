@@ -1,5 +1,7 @@
+import StatusDetails from "@/components/modules/sender/StatusDetails";
+
 function ParcelStatus() {
-  return <div>ParcelStatus</div>;
+  return <StatusDetails />;
 }
 
 export default ParcelStatus;

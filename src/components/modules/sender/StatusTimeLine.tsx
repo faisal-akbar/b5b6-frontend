@@ -1,10 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { IStatusLog } from "@/types";
 import { format } from "date-fns";
 import {
   CheckCircle,
   Clock,
   Flag,
+  InfoIcon,
   Package,
   Shield,
   Truck,
@@ -39,7 +45,7 @@ const getStatusIcon = (status: string) => {
       return <Package className="w-5 h-5 text-gray-500" />;
   }
 };
-const TimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
+const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
   return (
     <div className="lg:col-span-2">
       <Card className="p-6 shadow-lg border-0 bg-gradient-to-br from-card to-card/50">
@@ -59,16 +65,31 @@ const TimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                   )}
                 </div>
                 <div className="flex-1 pb-6">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                    <h4 className="font-semibold mb-2 md:mb-0">
+                  <div className=" flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                    <h4 className="relative font-semibold mb-2 md:mb-0">
                       {item.status}
+                      <div className="absolute -inset-y-2 -end-4 text-muted-foreground/80">
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <InfoIcon size={14} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              Status updated by {item?.updatedBy?.name},{" "}
+                              {item?.updatedBy?.role}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </h4>
+
                     <span className="text-sm text-muted-foreground">
                       {format(
                         new Date(item.updatedAt).toLocaleString(),
                         "PP h:mm a"
                       )}
                     </span>
+                    <span className="text-sm text-muted-foreground"></span>
                   </div>
                   {item.location && (
                     <p className="text-sm text-muted-foreground mb-1">
@@ -86,4 +107,4 @@ const TimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
   );
 };
 
-export default TimeLine;
+export default StatusTimeLine;

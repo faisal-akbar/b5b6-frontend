@@ -122,6 +122,7 @@ import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -218,11 +219,13 @@ const columns: ColumnDef<ISenderParcel>[] = [
     enableSorting: true,
   },
   {
-    header: "Cancel At",
-    accessorKey: "cancelAt",
+    header: "Cancelled At",
+    accessorKey: "cancelledAt",
     cell: ({ row }) => {
-      const cancelAt = row.getValue("cancelAt");
-      return <div>{cancelAt ? format(cancelAt as Date, "PPP") : "-"}</div>;
+      const cancelledAt = row.getValue("cancelledAt");
+      return (
+        <div>{cancelledAt ? format(cancelledAt as Date, "PPP") : "-"}</div>
+      );
     },
     size: 165,
     enableHiding: true,
@@ -926,7 +929,9 @@ function RowActions({ row }: { row: Row<ISenderParcel> }) {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Show Status</span>
+            <Link to={`/sender/${row.original._id}/status`}>
+              <span>Show Status</span>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

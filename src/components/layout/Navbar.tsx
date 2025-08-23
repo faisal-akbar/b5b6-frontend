@@ -30,7 +30,7 @@ const navigationLinks = [
   { href: "/contact", label: "Contact", role: "PUBLIC" },
   { href: "/admin/analytics", label: "Dashboard", role: Role.ADMIN },
   { href: "/admin/analytics", label: "Dashboard", role: Role.SUPER_ADMIN },
-  { href: "/sender/create-parcel", label: "Dashboard", role: Role.SENDER },
+  { href: "/sender/me", label: "Dashboard", role: Role.SENDER },
   { href: "/receiver/me/incoming", label: "Dashboard", role: Role.RECEIVER },
 ];
 

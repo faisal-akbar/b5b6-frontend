@@ -48,16 +48,18 @@ export interface ISenderParcel {
   cancelledAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  deliveryPersonnel?: any[];
 }
 
 export interface Sender {
-  _id: string;
+  _id?: string;
   name: string;
   email: string;
   phone: string;
 }
 
 export interface Receiver {
+  _id?: string;
   name: string;
   email: string;
   phone: string;
