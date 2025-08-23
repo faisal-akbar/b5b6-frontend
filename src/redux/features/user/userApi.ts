@@ -14,12 +14,14 @@ export const userApi = baseApi.injectEndpoints({
         url: "/user/me",
         method: "GET",
       }),
+      providesTags: ["USER"],
     }),
     getAllUsers: builder.query({
       query: () => ({
         url: "/users/all-users",
         method: "GET",
       }),
+      providesTags: ["USER"],
     }),
     createAdmin: builder.mutation({
       query: (data) => ({
@@ -40,6 +42,7 @@ export const userApi = baseApi.injectEndpoints({
         url: `/user/${id}`,
         method: "GET",
       }),
+      providesTags: ["USER"],
     }),
     updateUserById: builder.mutation({
       query: ({ id, data }) => ({
@@ -47,12 +50,14 @@ export const userApi = baseApi.injectEndpoints({
         method: "PATCH",
         data,
       }),
+      invalidatesTags: ["USER"],
     }),
     blockUserById: builder.mutation({
       query: (id) => ({
         url: `/user/${id}/block-user`,
         method: "PATCH",
       }),
+      invalidatesTags: ["USER"],
     }),
   }),
 });

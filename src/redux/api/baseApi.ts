@@ -9,6 +9,6 @@ export const baseApi = createApi({
   //     baseUrl: config.baseUrl,
   //     credentials: "include",
   //   }),
-  tagTypes: ["USER", "TOUR"],
+  tagTypes: ["AUTH", "USER", "SENDER_PARCEL"],
   endpoints: () => ({}),
 });

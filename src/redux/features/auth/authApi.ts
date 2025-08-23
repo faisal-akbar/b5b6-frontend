@@ -14,6 +14,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/auth/logout",
         method: "POST",
       }),
+      invalidatesTags: ["USER", "SENDER_PARCEL"],
     }),
     refreshToken: builder.mutation({
       query: () => ({

@@ -50,6 +50,7 @@ export const parcelApi = baseApi.injectEndpoints({
           currentStatus: currentStatus,
         },
       }),
+      providesTags: ["SENDER_PARCEL"],
     }),
     // Receiver
     getIncomingParcels: builder.query({

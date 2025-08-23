@@ -10,6 +10,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
+import {
+  ADMIN_DEFAULT_ROUTE,
+  RECEIVER_DEFAULT_ROUTE,
+  SENDER_DEFAULT_ROUTE,
+} from "@/routes/constants";
 import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -30,10 +35,21 @@ export function LoginForm({
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const res = await login(data).unwrap();
+      console.log(res);
 
       if (res.success) {
         toast.success("Logged in successfully");
-        navigate("/");
+        if (
+          res?.data?.user?.role === "ADMIN" ||
+          res?.data?.user?.role === "SUPER_ADMIN"
+        ) {
+          navigate(ADMIN_DEFAULT_ROUTE);
+        } else if (res?.data?.user?.role === "SENDER") {
+          navigate(SENDER_DEFAULT_ROUTE);
+        } else if (res?.data?.user?.role === "RECEIVER") {
+          navigate(RECEIVER_DEFAULT_ROUTE);
+        }
+        return;
       }
     } catch (err) {
       console.error(err);

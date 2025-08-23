@@ -14,8 +14,13 @@ import {
 import { authApi, useLogoutMutation } from "@/redux/features/auth/authApi";
 import { useGetMeQuery } from "@/redux/features/user/userApi";
 import { useAppDispatch } from "@/redux/hooks";
+import {
+  ADMIN_DEFAULT_ROUTE,
+  RECEIVER_DEFAULT_ROUTE,
+  SENDER_DEFAULT_ROUTE,
+} from "@/routes/constants";
 import { Role } from "@/types/user-type";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 import { ModeToggle } from "./ModeToggle";
 
@@ -28,13 +33,14 @@ const navigationLinks = [
   { href: "/faq", label: "FAQ", role: "PUBLIC" },
   { href: "/about", label: "About", role: "PUBLIC" },
   { href: "/contact", label: "Contact", role: "PUBLIC" },
-  { href: "/admin/analytics", label: "Dashboard", role: Role.ADMIN },
-  { href: "/admin/analytics", label: "Dashboard", role: Role.SUPER_ADMIN },
-  { href: "/sender/me", label: "Dashboard", role: Role.SENDER },
-  { href: "/receiver/me/incoming", label: "Dashboard", role: Role.RECEIVER },
+  { href: ADMIN_DEFAULT_ROUTE, label: "Dashboard", role: Role.ADMIN },
+  { href: ADMIN_DEFAULT_ROUTE, label: "Dashboard", role: Role.SUPER_ADMIN },
+  { href: SENDER_DEFAULT_ROUTE, label: "Dashboard", role: Role.SENDER },
+  { href: RECEIVER_DEFAULT_ROUTE, label: "Dashboard", role: Role.RECEIVER },
 ];
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const { data } = useGetMeQuery(undefined);
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
@@ -42,6 +48,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     await logout(undefined);
     dispatch(authApi.util.resetApiState());
+    navigate("/");
   };
 
   return (
@@ -88,11 +95,22 @@ export default function Navbar() {
               <NavigationMenu className="max-w-none *:w-full">
                 <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
                   {navigationLinks.map((link, index) => (
-                    <NavigationMenuItem key={index} className="w-full">
-                      <NavigationMenuLink asChild className="py-1.5">
-                        <Link to={link.href}>{link.label} </Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
+                    <Fragment key={index}>
+                      {link.role === "PUBLIC" && (
+                        <NavigationMenuItem className="w-full">
+                          <NavigationMenuLink asChild className="py-1.5">
+                            <Link to={link.href}>{link.label}</Link>
+                          </NavigationMenuLink>
+                        </NavigationMenuItem>
+                      )}
+                      {link.role === data?.data?.role && (
+                        <NavigationMenuItem className="w-full">
+                          <NavigationMenuLink asChild className="py-1.5">
+                            <Link to={link.href}>{link.label}</Link>
+                          </NavigationMenuLink>
+                        </NavigationMenuItem>
+                      )}
+                    </Fragment>
                   ))}
                 </NavigationMenuList>
               </NavigationMenu>

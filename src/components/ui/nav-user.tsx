@@ -32,15 +32,23 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
-  const [logout] = useLogoutMutation();
+  const [logout, { isSuccess, isLoading, isError, error }] =
+    useLogoutMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  console.log({ isSuccess, isLoading, isError, error });
+
   const handleLogout = async () => {
-    await logout(undefined);
-    dispatch(authApi.util.resetApiState());
-    toast.success("Logged out successfully");
-    navigate("/");
+    try {
+      await logout(undefined).unwrap();
+      toast.success("Logged out successfully");
+      navigate("/");
+      dispatch(authApi.util.resetApiState());
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to log out");
+    }
   };
 
   return (

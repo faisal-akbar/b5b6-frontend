@@ -19,6 +19,11 @@ import { generateRoutes } from "@/utils/generateRoutes";
 import { withAuth } from "@/utils/withAuth";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarItems } from "./adminSidebarItems";
+import {
+  ADMIN_DEFAULT_ROUTE,
+  RECEIVER_DEFAULT_ROUTE,
+  SENDER_DEFAULT_ROUTE,
+} from "./constants";
 import { receiverSidebarItems } from "./receiverSidebarItems";
 import { senderSidebarItems } from "./senderSidebarItems";
 
@@ -61,7 +66,7 @@ export const router = createBrowserRouter([
     Component: withAuth(DashboardLayout, Role.ADMIN as TRole),
     path: "/admin",
     children: [
-      { index: true, element: <Navigate to="/admin/analytics" /> },
+      { index: true, element: <Navigate to={ADMIN_DEFAULT_ROUTE} /> },
       ...generateRoutes(adminSidebarItems),
     ],
   },
@@ -69,7 +74,7 @@ export const router = createBrowserRouter([
     Component: withAuth(DashboardLayout, Role.SENDER as TRole),
     path: "/sender",
     children: [
-      { index: true, element: <Navigate to="/sender/me" /> },
+      { index: true, element: <Navigate to={SENDER_DEFAULT_ROUTE} /> },
       ...generateRoutes(senderSidebarItems),
       { Component: ParcelStatus, path: ":id/status" },
     ],
@@ -78,7 +83,7 @@ export const router = createBrowserRouter([
     Component: withAuth(DashboardLayout, Role.RECEIVER as TRole),
     path: "/receiver",
     children: [
-      { index: true, element: <Navigate to="/receiver/me/incoming" /> },
+      { index: true, element: <Navigate to={RECEIVER_DEFAULT_ROUTE} /> },
       ...generateRoutes(receiverSidebarItems),
     ],
   },
