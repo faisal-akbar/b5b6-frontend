@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
+import { getNameInitials } from "@/utils/getNameInitials";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -53,7 +54,9 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {getNameInitials(user?.name)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>

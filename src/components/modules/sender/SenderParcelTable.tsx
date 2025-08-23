@@ -1,13 +1,9 @@
 import {
   ColumnDef,
   ColumnFiltersState,
-  FilterFn,
   flexRender,
   getCoreRowModel,
   getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   PaginationState,
   Row,
   SortingState,
@@ -15,6 +11,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import {
+  ArrowRightIcon,
   ChevronDownIcon,
   ChevronFirstIcon,
   ChevronLastIcon,
@@ -22,15 +19,19 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
   CircleAlertIcon,
-  CircleXIcon,
   Columns3Icon,
   EllipsisIcon,
   FilterIcon,
-  ListFilterIcon,
+  InfoIcon,
+  Package,
   PlusIcon,
+  Scale,
+  SearchIcon,
   TrashIcon,
+  Truck,
+  XIcon,
 } from "lucide-react";
-import { useId, useMemo, useRef, useState } from "react";
+import { useId, useState } from "react";
 
 import {
   AlertDialog,
@@ -43,6 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,12 +55,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -88,187 +85,219 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useGetSenderParcelsQuery } from "@/redux/features/parcel/parcelApi";
+import { ISenderParcel } from "@/types";
+import { ParcelStatus } from "@/types/sender-parcel-type";
+import { getNameInitials } from "@/utils/getNameInitials";
+import { getStatusColor } from "@/utils/getStatusColor";
+import { format } from "date-fns";
 
-type Item = {
-  id: string;
-  name: string;
-  email: string;
-  location: string;
-  flag: string;
-  status: "Active" | "Inactive" | "Pending";
-  balance: number;
-};
+const columns: ColumnDef<ISenderParcel>[] = [
+  {
+    header: "Sender",
+    accessorKey: "Sender",
+    cell: ({ row }) => {
+      const name = row.original.sender.name;
+      const initials = getNameInitials(name);
 
-// Custom filter function for multi-column searching
-const multiColumnFilterFn: FilterFn<Item> = (row, columnId, filterValue) => {
-  const searchableRowContent =
-    `${row.original.name} ${row.original.email}`.toLowerCase();
-  const searchTerm = (filterValue ?? "").toLowerCase();
-  return searchableRowContent.includes(searchTerm);
-};
+      return (
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <div className="font-medium">{name}</div>
+            <div className="text-sm text-muted-foreground">
+              {row.original.pickupAddress}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original.sender.email}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original.sender.phone}
+            </div>
+          </div>
+        </div>
+      );
+    },
+    size: 210,
+    enableHiding: true,
+    enableSorting: false,
+  },
+  {
+    header: "Receiver",
+    accessorKey: "Receiver",
+    cell: ({ row }) => {
+      const name = row.original.receiver.name;
+      const initials = getNameInitials(name);
+      return (
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <div className="font-medium">{row.original.receiver.name}</div>
+            <div className="text-sm text-muted-foreground">
+              {row.original.deliveryAddress}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original.receiver.email}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original.receiver.phone}
+            </div>
+          </div>
+        </div>
+      );
+    },
+    size: 210,
+    enableHiding: true,
+    enableSorting: false,
+  },
+  {
+    header: "Estimated Delivery",
+    accessorKey: "estimatedDelivery",
+    cell: ({ row }) => (
+      <div>{format(row.getValue("estimatedDelivery"), "PPP")}</div>
+    ),
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Deliver At",
+    accessorKey: "deliverAt",
+    cell: ({ row }) => {
+      const deliverAt = row.getValue("deliverAt");
+      return <div>{deliverAt ? format(deliverAt as Date, "PPP") : "-"}</div>;
+    },
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Cancel At",
+    accessorKey: "cancelAt",
+    cell: ({ row }) => {
+      const cancelAt = row.getValue("cancelAt");
+      return <div>{cancelAt ? format(cancelAt as Date, "PPP") : "-"}</div>;
+    },
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
+  },
 
-const statusFilterFn: FilterFn<Item> = (
-  row,
-  columnId,
-  filterValue: string[]
-) => {
-  if (!filterValue?.length) return true;
-  const status = row.getValue(columnId) as string;
-  return filterValue.includes(status);
-};
-
-const columns: ColumnDef<Item>[] = [
+  {
+    header: "Parcel Info",
+    accessorKey: "weight",
+    cell: ({ row }) => {
+      const packageType = `${row.original.type
+        .charAt(0)
+        .toUpperCase()}${row.original.type.slice(1)}`;
+      const shippingType = `${row.original.shippingType
+        .charAt(0)
+        .toUpperCase()}${row.original.shippingType.slice(1)}`;
+      return (
+        <div className="space-y-1">
+          <div className="font-medium flex items-center gap-2">
+            <Scale className="h-4 w-4" />
+            {row.original.weight} {row.original.weightUnit}
+          </div>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            {packageType}
+          </div>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Truck className="h-4 w-4" />
+            {shippingType}
+          </div>
+        </div>
+      );
+    },
+    size: 130,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Cost",
+    accessorKey: "fee",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("fee"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "BDT",
+        minimumFractionDigits: 0,
+      }).format(amount);
+      return (
+        <div className="space-y-1">
+          <div>{formatted.slice(4)}</div>
+          <div className="text-sm text-muted-foreground">BDT</div>
+        </div>
+      );
+    },
+    size: 130,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Paid",
+    accessorKey: "isPaid",
+    cell: ({ row }) => {
+      return <div>{row.original.isPaid ? "Yes" : "No"}</div>;
+    },
+    size: 100,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Current Location",
+    accessorKey: "currentLocation",
+    cell: ({ row }) => {
+      const currentLocation = row.getValue("currentLocation");
+      return <div>{currentLocation ? (currentLocation as string) : "-"}</div>;
+    },
+    size: 160,
+    enableHiding: true,
+    enableSorting: true,
+  },
   {
     header: "Tracking ID",
     accessorKey: "trackingId",
     cell: ({ row }) => (
       <div className="text-left">{row.getValue("trackingId")}</div>
     ),
-    size: 220,
-    enableHiding: false,
+    size: 210,
+    enableHiding: true,
     enableSorting: true,
   },
-  {
-    header: "Type",
-    accessorKey: "type",
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("type")}</div>
-    ),
-    size: 180,
-    filterFn: multiColumnFilterFn,
-    enableHiding: false,
-  },
-  {
-    header: "Shipping Type",
-    accessorKey: "shippingType",
-    size: 220,
-  },
-  {
-    header: "Weight",
-    accessorKey: "weight",
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span>{" "}
-        {row.getValue("weight")} {row.getValue("weightUnit")}
-      </div>
-    ),
-    size: 180,
-  },
-  {
-    header: "Coupon Code",
-    accessorKey: "couponCode",
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span>{" "}
-        {row.getValue("couponCode")}
-      </div>
-    ),
-    size: 180,
-  },
-  {
-    header: "Estimated Delivery",
-    accessorKey: "estimatedDelivery",
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span>{" "}
-        {row.getValue("estimatedDelivery")}
-      </div>
-    ),
-    size: 180,
-  },
+
   {
     header: "Status",
     accessorKey: "currentStatus",
     cell: ({ row }) => (
-      <Badge
-        className={cn(
-          row.getValue("currentStatus") === "Inactive" &&
-            "bg-muted-foreground/60 text-primary-foreground"
-        )}
-      >
+      <Badge className={getStatusColor(row.getValue("currentStatus"))}>
         {row.getValue("currentStatus")}
       </Badge>
     ),
     size: 100,
-    filterFn: statusFilterFn,
-  },
-  {
-    header: "Current Location",
-    accessorKey: "currentLocation",
-  },
-  {
-    header: "Receiver Name",
-    accessorKey: "receiverName",
-    cell: ({ row }) => {
-      return <div>{row.getValue("receiverName")}</div>;
-    },
-    size: 180,
-  },
-  {
-    header: "Receiver Email",
-    accessorKey: "receiverEmail",
-    cell: ({ row }) => {
-      return <div>{row.getValue("receiverEmail")}</div>;
-    },
-    size: 180,
-  },
-  {
-    header: "Receiver Phone",
-    accessorKey: "receiverPhone",
-    cell: ({ row }) => {
-      return <div>{row.getValue("receiverPhone")}</div>;
-    },
-    size: 180,
-  },
-  {
-    header: "Pickup Address",
-    accessorKey: "pickupAddress",
-    cell: ({ row }) => {
-      return <div>{row.getValue("receiverAddress")}</div>;
-    },
-    size: 180,
-  },
-  {
-    header: "Delivery Address",
-    accessorKey: "deliveryAddress",
-    cell: ({ row }) => {
-      return <div>{row.getValue("deliveryAddress")}</div>;
-    },
-    size: 180,
-  },
-  {
-    header: "Deliver At",
-    accessorKey: "deliverAt",
-    cell: ({ row }) => {
-      return <div>{row.getValue("deliverAt")}</div>;
-    },
-    size: 180,
-  },
-  {
-    header: "Cancel At",
-    accessorKey: "cancelAt",
-    cell: ({ row }) => {
-      return <div>{row.getValue("cancelAt")}</div>;
-    },
-    size: 180,
+    enableHiding: true,
+    enableSorting: true,
   },
   {
     header: "Created At",
     accessorKey: "createdAt",
     cell: ({ row }) => {
-      return <div>{row.getValue("createdAt")}</div>;
+      return <div>{format(row.getValue("createdAt") as Date, "PPP")}</div>;
     },
     size: 180,
-  },
-  {
-    header: "Receiver Country",
-    accessorKey: "receiverCountry",
-    cell: ({ row }) => {
-      return <div>{row.getValue("receiverCountry")}</div>;
-    },
-    size: 180,
+    enableHiding: true,
+    enableSorting: true,
   },
   {
     id: "actions",
@@ -282,44 +311,97 @@ const columns: ColumnDef<Item>[] = [
 export default function SenderParcelTable() {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    Sender: false,
+    currentLocation: false,
+    createdAt: false,
+    cancelAt: false,
+  });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "name",
-      desc: false,
-    },
-  ]);
+  // Add search states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [appliedSearchTerm, setAppliedSearchTerm] = useState("");
 
-  const { data: senderParcels } = useGetSenderParcelsQuery();
-  console.log(senderParcels);
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  const currentQuery = {
+    searchTerm: appliedSearchTerm || undefined,
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+    sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
+    currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
+  };
+
+  const { data: senderParcels } = useGetSenderParcelsQuery({
+    ...currentQuery,
+  });
+
+  // Search handlers
+  const handleSearch = () => {
+    setAppliedSearchTerm(searchTerm);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setAppliedSearchTerm("");
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  // handleStatusChange function
+  const handleStatusChange = (checked: boolean, value: ParcelStatus) => {
+    setStatusFilter((prev) => {
+      if (checked) {
+        return [...prev, value];
+      } else {
+        return prev.filter((status) => status !== value);
+      }
+    });
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
 
   const handleDeleteRows = () => {
     const selectedRows = table.getSelectedRowModel().rows;
-    const updatedData = senderParcels?.data.filter(
-      (item) => !selectedRows.some((row) => row.original.id === item.id)
-    );
-    table.resetRowSelection();
   };
 
   const table = useReactTable({
     data: senderParcels?.data || [],
     columns,
+    // Server-side pagination configuration
+    manualPagination: true,
+    pageCount: senderParcels?.meta?.totalPage,
+    rowCount: senderParcels?.meta?.total,
+
+    // Server-side sorting configuration
+    manualSorting: true,
+    enableSortingRemoval: true,
+    enableMultiSort: false,
+
+    // manual filtering
+    manualFiltering: true,
+
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    enableSortingRemoval: false,
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
+    // getSortedRowModel: getSortedRowModel(),
+
+    // onSortingChange: setSorting,
+    // getPaginationRowModel: getPaginationRowModel(),
+    // onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    getFilteredRowModel: getFilteredRowModel(),
+    // getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    // Event handlers
+    onSortingChange: (updater) => {
+      setSorting(updater);
+      // Reset to first page when sorting changes
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    },
+    onPaginationChange: setPagination,
     state: {
       sorting,
       pagination,
@@ -328,93 +410,60 @@ export default function SenderParcelTable() {
     },
   });
 
-  // Get unique status values
-  const uniqueStatusValues = useMemo(() => {
-    const statusColumn = table.getColumn("currentStatus");
-
-    if (!statusColumn) return [];
-
-    const values = Array.from(statusColumn.getFacetedUniqueValues().keys());
-
-    return values.sort();
-  }, [table.getColumn("status")?.getFacetedUniqueValues()]);
-
-  // Get counts for each status
-  const statusCounts = useMemo(() => {
-    const statusColumn = table.getColumn("currentStatus");
-    if (!statusColumn) return new Map();
-    return statusColumn.getFacetedUniqueValues();
-  }, [table.getColumn("currentStatus")?.getFacetedUniqueValues()]);
-
-  const selectedStatuses = useMemo(() => {
-    const filterValue = table
-      .getColumn("currentStatus")
-      ?.getFilterValue() as string[];
-    return filterValue ?? [];
-  }, [table.getColumn("currentStatus")?.getFilterValue()]);
-
-  const handleStatusChange = (checked: boolean, value: string) => {
-    const filterValue = table
-      .getColumn("currentStatus")
-      ?.getFilterValue() as string[];
-    const newFilterValue = filterValue ? [...filterValue] : [];
-
-    if (checked) {
-      newFilterValue.push(value);
-    } else {
-      const index = newFilterValue.indexOf(value);
-      if (index > -1) {
-        newFilterValue.splice(index, 1);
-      }
-    }
-
-    table
-      .getColumn("status")
-      ?.setFilterValue(newFilterValue.length ? newFilterValue : undefined);
-  };
-
   return (
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Filter by name or email */}
+          {/* Filter by tracking id */}
           <div className="relative">
             <Input
-              id={`${id}-input`}
-              ref={inputRef}
-              className={cn(
-                "peer min-w-60 ps-9",
-                Boolean(table.getColumn("name")?.getFilterValue()) && "pe-9"
-              )}
-              value={
-                (table.getColumn("name")?.getFilterValue() ?? "") as string
-              }
-              onChange={(e) =>
-                table.getColumn("name")?.setFilterValue(e.target.value)
-              }
-              placeholder="Filter by name or email..."
+              // id={id}
+              className="peer ps-9 pe-9"
+              placeholder="Search..."
               type="text"
-              aria-label="Filter by name or email"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
             />
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-              <ListFilterIcon size={16} aria-hidden="true" />
+              <SearchIcon size={16} />
             </div>
-            {Boolean(table.getColumn("name")?.getFilterValue()) && (
+            {searchTerm && (
               <button
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Clear filter"
-                onClick={() => {
-                  table.getColumn("name")?.setFilterValue("");
-                  if (inputRef.current) {
-                    inputRef.current.focus();
-                  }
-                }}
+                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Clear input"
+                onClick={handleClearSearch}
               >
-                <CircleXIcon size={16} aria-hidden="true" />
+                <XIcon size={16} aria-hidden="true" />
               </button>
             )}
+            {
+              <button
+                onClick={handleSearch}
+                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Submit search"
+                type="submit"
+              >
+                <ArrowRightIcon size={16} aria-hidden="true" />
+              </button>
+            }
+            <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon size={14} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Search by tracking ID or address</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
+
           {/* Filter by status */}
           <Popover>
             <PopoverTrigger asChild>
@@ -425,9 +474,9 @@ export default function SenderParcelTable() {
                   aria-hidden="true"
                 />
                 Status
-                {selectedStatuses.length > 0 && (
+                {statusFilter.length > 0 && (
                   <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {selectedStatuses.length}
+                    {statusFilter.length}
                   </span>
                 )}
               </Button>
@@ -438,23 +487,20 @@ export default function SenderParcelTable() {
                   Filters
                 </div>
                 <div className="space-y-3">
-                  {uniqueStatusValues.map((value, i) => (
+                  {Object.values(ParcelStatus).map((value, i) => (
                     <div key={value} className="flex items-center gap-2">
                       <Checkbox
-                        id={`${id}-${i}`}
-                        checked={selectedStatuses.includes(value)}
+                        id={`status-${i}`}
+                        checked={statusFilter.includes(value)}
                         onCheckedChange={(checked: boolean) =>
                           handleStatusChange(checked, value)
                         }
                       />
                       <Label
-                        htmlFor={`${id}-${i}`}
+                        htmlFor={`status-${i}`}
                         className="flex grow justify-between gap-2 font-normal"
                       >
-                        {value}{" "}
-                        <span className="text-muted-foreground ms-2 text-xs">
-                          {statusCounts.get(value)}
-                        </span>
+                        {value}
                       </Label>
                     </div>
                   ))}
@@ -545,21 +591,21 @@ export default function SenderParcelTable() {
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {/* Add user button */}
+          {/* Send parcel button */}
           <Button className="ml-auto" variant="outline">
             <PlusIcon
               className="-ms-1 opacity-60"
               size={16}
               aria-hidden="true"
             />
-            Add user
+            Send Parcel
           </Button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-background overflow-hidden rounded-md border">
-        <Table className="table-fixed">
+      <div className="bg-background rounded-md border overflow-auto">
+        <Table className="table-auto min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
@@ -766,22 +812,11 @@ export default function SenderParcelTable() {
           </Pagination>
         </div>
       </div>
-      <p className="text-muted-foreground mt-4 text-center text-sm">
-        Example of a more complex table made with{" "}
-        <a
-          className="hover:text-foreground underline"
-          href="https://tanstack.com/table"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TanStack Table
-        </a>
-      </p>
     </div>
   );
 }
 
-function RowActions({ row }: { row: Row<Item> }) {
+function RowActions({ row }: { row: Row<ISenderParcel> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -799,41 +834,16 @@ function RowActions({ row }: { row: Row<Item> }) {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Edit</span>
-            <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+            <span>Show Status</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Archive</span>
-            <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
+        <DropdownMenuItem>
+          <span>Cancel</span>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive focus:text-destructive">
           <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

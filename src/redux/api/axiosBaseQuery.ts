@@ -1,6 +1,7 @@
 import { axiosInstance } from "@/lib/axios";
 import { type BaseQueryFn } from "@reduxjs/toolkit/query";
 import { AxiosError, type AxiosRequestConfig } from "axios";
+import qs from "qs";
 
 const axiosBaseQuery =
   (): BaseQueryFn<
@@ -22,6 +23,9 @@ const axiosBaseQuery =
         data,
         params,
         headers,
+        // qs handles array serialization as repeated query params
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: "repeat" }),
       });
       return { data: result.data };
     } catch (axiosError) {

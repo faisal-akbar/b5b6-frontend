@@ -3,7 +3,7 @@ import type { Role } from "./user-type";
 
 export type { ILogin, ISendOtp, IVerifyOtp } from "./auth-type";
 export type { IParcelTrackData, IStatusLog } from "./parcel-type";
-export type { ISenderParcel } from "./sender-parcel-type";
+export type { ISenderParcel, ISenderParcelParams } from "./sender-parcel-type";
 
 export interface IResponse<T> {
   statusCode: number;

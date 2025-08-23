@@ -76,3 +76,11 @@ export interface UpdatedBy {
   name: string;
   role: string;
 }
+
+export interface ISenderParcelParams {
+  searchTerm?: string;
+  page: number;
+  limit: number;
+  sort?: string;
+  currentStatus?: string[];
+}
