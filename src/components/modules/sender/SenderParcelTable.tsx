@@ -1,4 +1,12 @@
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
@@ -31,8 +39,10 @@ import {
   Truck,
   XIcon,
 } from "lucide-react";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { useForm } from "react-hook-form";
 
+import DeleteConfirmation from "@/components/DeleteConformation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +58,16 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -91,12 +111,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useGetSenderParcelsQuery } from "@/redux/features/parcel/parcelApi";
+import {
+  useCancelParcelMutation,
+  useDeleteParcelMutation,
+  useGetSenderParcelsQuery,
+} from "@/redux/features/parcel/parcelApi";
 import { ISenderParcel } from "@/types";
 import { ParcelStatus } from "@/types/sender-parcel-type";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import z from "zod";
+
+// schema for cancel note
+const cancelNoteSchema = z.object({
+  note: z
+    .string()
+    .min(5, { message: "Reason too short" })
+    .max(200, { message: "Reason too long" })
+    .trim(),
+});
 
 const columns: ColumnDef<ISenderParcel>[] = [
   {
@@ -817,6 +853,62 @@ export default function SenderParcelTable() {
 }
 
 function RowActions({ row }: { row: Row<ISenderParcel> }) {
+  const form = useForm<z.infer<typeof cancelNoteSchema>>({
+    resolver: zodResolver(cancelNoteSchema),
+    defaultValues: { note: "" },
+  });
+  const [cancelParcel, { isLoading, isError, error }] =
+    useCancelParcelMutation();
+  const [
+    deleteParcel,
+    { isLoading: isDeleting, isError: isDeleteError, error: deleteError },
+  ] = useDeleteParcelMutation();
+
+  // Cancel Parcel
+  const handleCancel = async (data: z.infer<typeof cancelNoteSchema>) => {
+    try {
+      const res = await cancelParcel({
+        id: row.original._id,
+        note: data.note,
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Parcel canceled successfully");
+      }
+    } catch (error) {
+      console.error("Failed to cancel parcel", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to cancel parcel", {
+        description: error?.data?.message,
+      });
+    }
+  }, [isError, error]);
+
+  // Delete Parcel
+  const handleDelete = async (row: Row<ISenderParcel>) => {
+    try {
+      const res = await deleteParcel(row.original._id).unwrap();
+
+      if (res.success) {
+        toast.success("Parcel deleted successfully");
+      }
+    } catch (error) {
+      console.error("Failed to delete parcel", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isDeleteError) {
+      toast.error("Failed to delete parcel", {
+        description: deleteError?.data?.message,
+      });
+    }
+  }, [isDeleteError, deleteError]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -838,12 +930,72 @@ function RowActions({ row }: { row: Row<ISenderParcel> }) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <span>Cancel</span>
+        <DropdownMenuItem asChild>
+          <Dialog>
+            <DialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <span>Cancel</span>
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Confirm Cancellation</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to cancel this parcel? This action
+                  cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleCancel)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Reason</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter reason" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline" type="button">
+                        Don't Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Cancelling..." : "Cancel Parcel"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
+        <DropdownMenuItem asChild>
+          <DeleteConfirmation
+            trigger={
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <span>Delete</span>
+              </DropdownMenuItem>
+            }
+            title="Are you absolutely sure?"
+            description={`This action cannot be undone. This will permanently delete the parcel`}
+            onConfirm={() => {
+              handleDelete(row);
+            }}
+            isLoading={isDeleting}
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

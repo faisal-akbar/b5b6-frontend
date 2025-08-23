@@ -5,7 +5,6 @@ import {
   ISenderParcel,
   ISenderParcelParams,
 } from "@/types";
-import { current } from "@reduxjs/toolkit";
 
 export const parcelApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,13 +16,14 @@ export const parcelApi = baseApi.injectEndpoints({
         data,
       }),
     }),
-    cancelParcel: builder.mutation({
-      query: (id) => ({
+    cancelParcel: builder.mutation<unknown, { id: string; note: string }>({
+      query: ({ id, note }) => ({
         url: `/parcels/cancel/${id}`,
         method: "POST",
+        data: { note },
       }),
     }),
-    deleteParcel: builder.mutation({
+    deleteParcel: builder.mutation<unknown, string>({
       query: (id) => ({
         url: `/parcels/delete/${id}`,
         method: "POST",
