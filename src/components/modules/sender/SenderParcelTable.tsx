@@ -355,7 +355,7 @@ export default function SenderParcelTable() {
     Sender: false,
     currentLocation: false,
     createdAt: false,
-    cancelAt: false,
+    cancelledAt: false,
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
