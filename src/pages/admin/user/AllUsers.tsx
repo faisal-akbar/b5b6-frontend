@@ -1,5 +1,7 @@
+import UsersTable from "@/components/modules/admin/users/UsersTable";
+
 function AllUsers() {
-  return <div>AllUsers</div>;
+  return <UsersTable />;
 }
 
 export default AllUsers;

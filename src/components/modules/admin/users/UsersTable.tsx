@@ -1,13 +1,17 @@
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
   ColumnDef,
   ColumnFiltersState,
-  FilterFn,
   flexRender,
   getCoreRowModel,
   getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   PaginationState,
   Row,
   SortingState,
@@ -15,37 +19,39 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import {
+  ArrowRightIcon,
   ChevronDownIcon,
   ChevronFirstIcon,
   ChevronLastIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
-  CircleAlertIcon,
-  CircleXIcon,
   Columns3Icon,
   EllipsisIcon,
   FilterIcon,
-  ListFilterIcon,
+  InfoIcon,
   PlusIcon,
-  TrashIcon,
+  SearchIcon,
+  XIcon,
 } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { useForm } from "react-hook-form";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import DeleteConfirmation from "@/components/DeleteConformation";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -53,12 +59,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -88,118 +89,152 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import {
+  useCancelParcelMutation,
+  useDeleteParcelMutation,
+} from "@/redux/features/parcel/parcelApi";
+import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
+import { IParcel, IUser } from "@/types";
+import { IsActive, Role } from "@/types/user-type";
+import { getNameInitials } from "@/utils/getNameInitials";
+import { getUserIsActiveStatusColor } from "@/utils/getStatusColor";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { Link } from "react-router";
+import { toast } from "sonner";
+import z from "zod";
+import { CreateParcelDialog } from "../../sender/SendParcelModal";
 
-type Item = {
-  id: string;
-  name: string;
-  email: string;
-  location: string;
-  flag: string;
-  status: "Active" | "Inactive" | "Pending";
-  balance: number;
-};
+// schema for cancel note
+const cancelNoteSchema = z.object({
+  note: z
+    .string()
+    .min(5, { message: "Reason too short" })
+    .max(200, { message: "Reason too long" })
+    .trim(),
+});
 
-// Custom filter function for multi-column searching
-const multiColumnFilterFn: FilterFn<Item> = (row, columnId, filterValue) => {
-  const searchableRowContent =
-    `${row.original.name} ${row.original.email}`.toLowerCase();
-  const searchTerm = (filterValue ?? "").toLowerCase();
-  return searchableRowContent.includes(searchTerm);
-};
-
-const statusFilterFn: FilterFn<Item> = (
-  row,
-  columnId,
-  filterValue: string[]
-) => {
-  if (!filterValue?.length) return true;
-  const status = row.getValue(columnId) as string;
-  return filterValue.includes(status);
-};
-
-const columns: ColumnDef<Item>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    size: 28,
-    enableSorting: false,
-    enableHiding: false,
-  },
+const columns: ColumnDef<IUser>[] = [
   {
     header: "Name",
     accessorKey: "name",
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("name")}</div>
-    ),
-    size: 180,
-    filterFn: multiColumnFilterFn,
-    enableHiding: false,
+    cell: ({ row }) => {
+      const name = row.original.name;
+      const initials = getNameInitials(name);
+
+      return (
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <div className="font-medium">{name}</div>
+          </div>
+        </div>
+      );
+    },
+    size: 210,
+    enableHiding: true,
+    enableSorting: false,
   },
   {
     header: "Email",
     accessorKey: "email",
-    size: 220,
+    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
   },
   {
-    header: "Location",
-    accessorKey: "location",
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span>{" "}
-        {row.getValue("location")}
-      </div>
-    ),
-    size: 180,
+    header: "Address",
+    accessorKey: "defaultAddress",
+    cell: ({ row }) => {
+      const defaultAddress = row.getValue("defaultAddress");
+      return <div>{`${defaultAddress ? defaultAddress : "-"}`}</div>;
+    },
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
   },
   {
-    header: "Status",
-    accessorKey: "status",
+    header: "Phone",
+    accessorKey: "phone",
+    cell: ({ row }) => {
+      const phone = row.getValue("phone");
+      return <div>{`${phone ? phone : "-"}`}</div>;
+    },
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Role",
+    accessorKey: "role",
+    cell: ({ row }) => {
+      return <div>{row.getValue("role")}</div>;
+    },
+    size: 165,
+    enableHiding: true,
+    enableSorting: true,
+  },
+
+  {
+    header: "Is Verified",
+    accessorKey: "isVerified",
+    cell: ({ row }) => {
+      return <div>{row.original.isVerified ? "Yes" : "No"}</div>;
+    },
+    size: 100,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Is Active",
+    accessorKey: "isActive",
     cell: ({ row }) => (
-      <Badge
-        className={cn(
-          row.getValue("status") === "Inactive" &&
-            "bg-muted-foreground/60 text-primary-foreground"
-        )}
-      >
-        {row.getValue("status")}
+      <Badge className={getUserIsActiveStatusColor(row.getValue("isActive"))}>
+        {row.getValue("isActive")}
       </Badge>
     ),
     size: 100,
-    filterFn: statusFilterFn,
+    enableHiding: true,
+    enableSorting: true,
   },
   {
-    header: "Performance",
-    accessorKey: "performance",
-  },
-  {
-    header: "Balance",
-    accessorKey: "balance",
+    header: "Is Deleted",
+    accessorKey: "isDeleted",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("balance"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return formatted;
+      return (
+        <>
+          {row.getValue("isDeleted") ? (
+            <Badge className="bg-red-100 text-red-800">
+              {row.getValue("isDeleted")}
+            </Badge>
+          ) : (
+            "-"
+          )}
+        </>
+      );
     },
-    size: 120,
+    size: 100,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Created At",
+    accessorKey: "createdAt",
+    cell: ({ row }) => {
+      return <div>{format(row.getValue("createdAt") as Date, "PPP")}</div>;
+    },
+    size: 180,
+    enableHiding: true,
+    enableSorting: true,
   },
   {
     id: "actions",
@@ -212,55 +247,117 @@ const columns: ColumnDef<Item>[] = [
 
 export default function UsersTable() {
   const id = useId();
+  const [open, setOpen] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [roleFilter, setRoleFilter] = useState<Role[]>([]);
+  const [verifiedFilter, setVerifiedFilter] = useState<boolean | undefined>(
+    undefined
+  );
+  const [statusFilter, setStatusFilter] = useState<IsActive[]>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    createdAt: false,
+  });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "name",
-      desc: false,
-    },
-  ]);
+  // Add search states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [appliedSearchTerm, setAppliedSearchTerm] = useState("");
 
-  const [data, setData] = useState<Item[]>([]);
-  useEffect(() => {
-    async function fetchPosts() {
-      const res = await fetch(
-        "https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/users-01_fertyx.json"
-      );
-      const data = await res.json();
-      setData(data);
-    }
-    fetchPosts();
-  }, []);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  const handleDeleteRows = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row.original.id === item.id)
-    );
-    setData(updatedData);
-    table.resetRowSelection();
+  const currentQuery = {
+    searchTerm: appliedSearchTerm || undefined,
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+    sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
+    role: roleFilter.length > 0 ? [...roleFilter] : undefined,
+    isActive: statusFilter.length > 0 ? [...statusFilter] : undefined,
+    isVerified: verifiedFilter !== undefined ? verifiedFilter : undefined,
+  };
+
+  const { data: usersData } = useGetAllUsersQuery({ ...currentQuery });
+
+  console.log({ usersData });
+
+  // Search handlers
+  const handleSearch = () => {
+    setAppliedSearchTerm(searchTerm);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setAppliedSearchTerm("");
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  // handleRoleChange function
+  const handleRoleChange = (checked: boolean, value: Role) => {
+    setRoleFilter((prev) => {
+      if (checked) {
+        return [...prev, value];
+      } else {
+        return prev.filter((role) => role !== value);
+      }
+    });
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  // handleStatusChange function
+  const handleStatusChange = (checked: boolean, value: IsActive) => {
+    setStatusFilter((prev) => {
+      if (checked) {
+        return [...prev, value];
+      } else {
+        return prev.filter((status) => status !== value);
+      }
+    });
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  // handleIsVerifiedChange function
+  const handleIsVerifiedChange = (checked: boolean, value: boolean) => {
+    const newValue = value ? true : false;
+    setVerifiedFilter(checked ? newValue : undefined);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   const table = useReactTable({
-    data,
+    data: usersData?.data || [],
     columns,
+    // Server-side pagination configuration
+    manualPagination: true,
+    pageCount: usersData?.meta?.totalPage,
+    rowCount: usersData?.meta?.total,
+
+    // Server-side sorting configuration
+    manualSorting: true,
+    enableSortingRemoval: true,
+    enableMultiSort: false,
+
+    // manual filtering
+    manualFiltering: true,
+
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    enableSortingRemoval: false,
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
+    // getSortedRowModel: getSortedRowModel(),
+
+    // onSortingChange: setSorting,
+    // getPaginationRowModel: getPaginationRowModel(),
+    // onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    getFilteredRowModel: getFilteredRowModel(),
+    // getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    // Event handlers
+    onSortingChange: (updater) => {
+      setSorting(updater);
+      // Reset to first page when sorting changes
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    },
+    onPaginationChange: setPagination,
     state: {
       sorting,
       pagination,
@@ -269,90 +366,63 @@ export default function UsersTable() {
     },
   });
 
-  // Get unique status values
-  const uniqueStatusValues = useMemo(() => {
-    const statusColumn = table.getColumn("status");
-
-    if (!statusColumn) return [];
-
-    const values = Array.from(statusColumn.getFacetedUniqueValues().keys());
-
-    return values.sort();
-  }, [table.getColumn("status")?.getFacetedUniqueValues()]);
-
-  // Get counts for each status
-  const statusCounts = useMemo(() => {
-    const statusColumn = table.getColumn("status");
-    if (!statusColumn) return new Map();
-    return statusColumn.getFacetedUniqueValues();
-  }, [table.getColumn("status")?.getFacetedUniqueValues()]);
-
-  const selectedStatuses = useMemo(() => {
-    const filterValue = table.getColumn("status")?.getFilterValue() as string[];
-    return filterValue ?? [];
-  }, [table.getColumn("status")?.getFilterValue()]);
-
-  const handleStatusChange = (checked: boolean, value: string) => {
-    const filterValue = table.getColumn("status")?.getFilterValue() as string[];
-    const newFilterValue = filterValue ? [...filterValue] : [];
-
-    if (checked) {
-      newFilterValue.push(value);
-    } else {
-      const index = newFilterValue.indexOf(value);
-      if (index > -1) {
-        newFilterValue.splice(index, 1);
-      }
-    }
-
-    table
-      .getColumn("status")
-      ?.setFilterValue(newFilterValue.length ? newFilterValue : undefined);
-  };
-
   return (
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Filter by name or email */}
+          {/* search */}
           <div className="relative">
             <Input
-              id={`${id}-input`}
-              ref={inputRef}
-              className={cn(
-                "peer min-w-60 ps-9",
-                Boolean(table.getColumn("name")?.getFilterValue()) && "pe-9"
-              )}
-              value={
-                (table.getColumn("name")?.getFilterValue() ?? "") as string
-              }
-              onChange={(e) =>
-                table.getColumn("name")?.setFilterValue(e.target.value)
-              }
-              placeholder="Filter by name or email..."
+              // id={id}
+              className="peer ps-9 pe-9"
+              placeholder="Search..."
               type="text"
-              aria-label="Filter by name or email"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
             />
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-              <ListFilterIcon size={16} aria-hidden="true" />
+              <SearchIcon size={16} />
             </div>
-            {Boolean(table.getColumn("name")?.getFilterValue()) && (
+            {searchTerm && (
               <button
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Clear filter"
-                onClick={() => {
-                  table.getColumn("name")?.setFilterValue("");
-                  if (inputRef.current) {
-                    inputRef.current.focus();
-                  }
-                }}
+                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Clear input"
+                onClick={handleClearSearch}
               >
-                <CircleXIcon size={16} aria-hidden="true" />
+                <XIcon size={16} aria-hidden="true" />
               </button>
             )}
+            {
+              <button
+                onClick={handleSearch}
+                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Submit search"
+                type="submit"
+              >
+                <ArrowRightIcon size={16} aria-hidden="true" />
+              </button>
+            }
+            <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon size={14} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    Search by name, email, address, phone, role, verified status
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
-          {/* Filter by status */}
+
+          {/* Filter by Role */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline">
@@ -361,10 +431,10 @@ export default function UsersTable() {
                   size={16}
                   aria-hidden="true"
                 />
-                Status
-                {selectedStatuses.length > 0 && (
+                Role
+                {statusFilter.length > 0 && (
                   <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {selectedStatuses.length}
+                    {statusFilter.length}
                   </span>
                 )}
               </Button>
@@ -375,23 +445,105 @@ export default function UsersTable() {
                   Filters
                 </div>
                 <div className="space-y-3">
-                  {uniqueStatusValues.map((value, i) => (
+                  {Object.values(Role).map((value, i) => (
                     <div key={value} className="flex items-center gap-2">
                       <Checkbox
-                        id={`${id}-${i}`}
-                        checked={selectedStatuses.includes(value)}
+                        id={`role-${i}`}
+                        checked={roleFilter.includes(value)}
+                        onCheckedChange={(checked: boolean) =>
+                          handleRoleChange(checked, value)
+                        }
+                      />
+                      <Label
+                        htmlFor={`status-${i}`}
+                        className="flex grow justify-between gap-2 font-normal"
+                      >
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Filter by status */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <FilterIcon
+                  className="-ms-1 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Active Status
+                {statusFilter.length > 0 && (
+                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                    {statusFilter.length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto min-w-36 p-3" align="start">
+              <div className="space-y-3">
+                <div className="text-muted-foreground text-xs font-medium">
+                  Filters
+                </div>
+                <div className="space-y-3">
+                  {Object.values(IsActive).map((value, i) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`status-${i}`}
+                        checked={statusFilter.includes(value)}
                         onCheckedChange={(checked: boolean) =>
                           handleStatusChange(checked, value)
                         }
                       />
                       <Label
-                        htmlFor={`${id}-${i}`}
+                        htmlFor={`status-${i}`}
                         className="flex grow justify-between gap-2 font-normal"
                       >
-                        {value}{" "}
-                        <span className="text-muted-foreground ms-2 text-xs">
-                          {statusCounts.get(value)}
-                        </span>
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Filter by isVerified */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <FilterIcon
+                  className="-ms-1 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Verified Status
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto min-w-36 p-3" align="start">
+              <div className="space-y-3">
+                <div className="text-muted-foreground text-xs font-medium">
+                  Filters
+                </div>
+                <div className="space-y-3">
+                  {["Yes", "No"].map((value, i) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`isVerified-${i}`}
+                        checked={verifiedFilter === (value === "Yes")}
+                        onCheckedChange={(checked: boolean) =>
+                          handleIsVerifiedChange(checked, value === "Yes")
+                        }
+                      />
+                      <Label
+                        htmlFor={`status-${i}`}
+                        className="flex grow justify-between gap-2 font-normal"
+                      >
+                        {value}
                       </Label>
                     </div>
                   ))}
@@ -435,68 +587,26 @@ export default function UsersTable() {
           </DropdownMenu>
         </div>
         <div className="flex items-center gap-3">
-          {/* Delete button */}
-          {table.getSelectedRowModel().rows.length > 0 && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="ml-auto" variant="outline">
-                  <TrashIcon
-                    className="-ms-1 opacity-60"
-                    size={16}
-                    aria-hidden="true"
-                  />
-                  Delete
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {table.getSelectedRowModel().rows.length}
-                  </span>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
-                  <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full border"
-                    aria-hidden="true"
-                  >
-                    <CircleAlertIcon className="opacity-80" size={16} />
-                  </div>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete{" "}
-                      {table.getSelectedRowModel().rows.length} selected{" "}
-                      {table.getSelectedRowModel().rows.length === 1
-                        ? "row"
-                        : "rows"}
-                      .
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                </div>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteRows}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-          {/* Add user button */}
-          <Button className="ml-auto" variant="outline">
+          {/* Send parcel button */}
+          <Button
+            onClick={() => setOpen(true)}
+            className="ml-auto"
+            variant="outline"
+          >
             <PlusIcon
               className="-ms-1 opacity-60"
               size={16}
               aria-hidden="true"
             />
-            Add user
+            Send Parcel
           </Button>
+          <CreateParcelDialog open={open} onOpenChange={setOpen} />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-background overflow-hidden rounded-md border">
-        <Table className="table-fixed">
+      <div className="bg-background rounded-md border overflow-auto">
+        <Table className="table-auto min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
@@ -703,22 +813,69 @@ export default function UsersTable() {
           </Pagination>
         </div>
       </div>
-      <p className="text-muted-foreground mt-4 text-center text-sm">
-        Example of a more complex table made with{" "}
-        <a
-          className="hover:text-foreground underline"
-          href="https://tanstack.com/table"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TanStack Table
-        </a>
-      </p>
     </div>
   );
 }
 
-function RowActions({ row }: { row: Row<Item> }) {
+function RowActions({ row }: { row: Row<IParcel> }) {
+  const [open, setOpen] = useState(false);
+  const form = useForm<z.infer<typeof cancelNoteSchema>>({
+    resolver: zodResolver(cancelNoteSchema),
+    defaultValues: { note: "" },
+  });
+  const [cancelParcel, { isLoading, isError, error }] =
+    useCancelParcelMutation();
+  const [
+    deleteParcel,
+    { isLoading: isDeleting, isError: isDeleteError, error: deleteError },
+  ] = useDeleteParcelMutation();
+
+  // Cancel Parcel
+  const handleCancel = async (data: z.infer<typeof cancelNoteSchema>) => {
+    try {
+      const res = await cancelParcel({
+        id: row.original._id,
+        note: data.note,
+      }).unwrap();
+
+      if (res.success) {
+        setOpen(false);
+        toast.success("Parcel canceled successfully");
+      }
+    } catch (error) {
+      console.error("Failed to cancel parcel", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to cancel parcel", {
+        description: error?.data?.message,
+      });
+    }
+  }, [isError, error]);
+
+  // Delete Parcel
+  const handleDelete = async (row: Row<IParcel>) => {
+    try {
+      const res = await deleteParcel(row.original._id).unwrap();
+
+      if (res.success) {
+        toast.success("Parcel deleted successfully");
+      }
+    } catch (error) {
+      console.error("Failed to delete parcel", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isDeleteError) {
+      toast.error("Failed to delete parcel", {
+        description: deleteError?.data?.message,
+      });
+    }
+  }, [isDeleteError, deleteError]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -736,41 +893,78 @@ function RowActions({ row }: { row: Row<Item> }) {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Edit</span>
-            <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+            <Link to={`/sender/${row.original._id}/status`}>
+              <span>Show Status</span>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Archive</span>
-            <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
+        <DropdownMenuItem asChild>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <span>Cancel</span>
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Confirm Cancellation</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to cancel this parcel? This action
+                  cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleCancel)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Reason</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter reason" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline" type="button">
+                        Don't Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Cancelling..." : "Cancel Parcel"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+        <DropdownMenuItem asChild>
+          <DeleteConfirmation
+            trigger={
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <span>Delete</span>
+              </DropdownMenuItem>
+            }
+            title="Are you absolutely sure?"
+            description={`This action cannot be undone. This will permanently delete the parcel`}
+            onConfirm={() => {
+              handleDelete(row);
+            }}
+            isLoading={isDeleting}
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

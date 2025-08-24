@@ -4,6 +4,7 @@ import type { Role } from "./user-type";
 export type { ILogin, ISendOtp, IVerifyOtp } from "./auth-type";
 export type { IParcelTrackData, IStatusLog } from "./parcel-type";
 export type { IParcel, IParcelParams } from "./sender-parcel-type";
+export type { IUser, IUserParams } from "./user-type";
 
 export interface IResponse<T> {
   statusCode: number;
