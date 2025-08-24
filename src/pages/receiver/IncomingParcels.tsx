@@ -1,5 +1,7 @@
+import ReceiverParcelTable from "@/components/modules/receiver/ReceiverIncomingParcelTable";
+
 function IncomingParcels() {
-  return <div>IncomingParcels</div>;
+  return <ReceiverParcelTable />;
 }
 
 export default IncomingParcels;

@@ -1,12 +1,4 @@
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
@@ -31,14 +23,12 @@ import {
   FilterIcon,
   InfoIcon,
   Package,
-  PlusIcon,
   Scale,
   SearchIcon,
   Truck,
   XIcon,
 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { useForm } from "react-hook-form";
 
 import DeleteConfirmation from "@/components/DeleteConformation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -46,23 +36,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -99,37 +77,24 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
-  useCancelParcelMutation,
-  useDeleteParcelMutation,
-  useGetSenderParcelsQuery,
+  useConfirmParcelDeliveryMutation,
+  useGetReceiverParcelHistoryQuery,
 } from "@/redux/features/parcel/parcelApi";
 import { IParcel } from "@/types";
 import { ParcelStatus } from "@/types/sender-parcel-type";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Link } from "react-router";
 import { toast } from "sonner";
-import z from "zod";
-import { CreateParcelDialog } from "./SendParcelModal";
-
-// schema for cancel note
-const cancelNoteSchema = z.object({
-  note: z
-    .string()
-    .min(5, { message: "Reason too short" })
-    .max(200, { message: "Reason too long" })
-    .trim(),
-});
 
 const columns: ColumnDef<IParcel>[] = [
   {
     header: "Sender",
     accessorKey: "Sender",
     cell: ({ row }) => {
-      const name = row.original.sender.name;
+      const name = row?.original?.sender?.name;
       const initials = getNameInitials(name);
+      console.log(name);
 
       return (
         <div className="flex items-start gap-3">
@@ -139,13 +104,13 @@ const columns: ColumnDef<IParcel>[] = [
           <div className="space-y-1">
             <div className="font-medium">{name}</div>
             <div className="text-sm text-muted-foreground">
-              {row.original.pickupAddress}
+              {row.original?.pickupAddress}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.sender.email}
+              {row.original.sender?.email}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.sender.phone}
+              {row.original.sender?.phone}
             </div>
           </div>
         </div>
@@ -159,7 +124,7 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Receiver",
     accessorKey: "Receiver",
     cell: ({ row }) => {
-      const name = row.original.receiver.name;
+      const name = row.original?.receiver?.name;
       const initials = getNameInitials(name);
       return (
         <div className="flex items-start gap-3">
@@ -167,15 +132,15 @@ const columns: ColumnDef<IParcel>[] = [
             <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
           </Avatar>
           <div className="space-y-1">
-            <div className="font-medium">{row.original.receiver.name}</div>
+            <div className="font-medium">{row.original?.receiver?.name}</div>
             <div className="text-sm text-muted-foreground">
-              {row.original.deliveryAddress}
+              {row.original?.deliveryAddress}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.receiver.email}
+              {row.original.receiver?.email}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.receiver.phone}
+              {row.original.receiver?.phone}
             </div>
           </div>
         </div>
@@ -335,13 +300,12 @@ const columns: ColumnDef<IParcel>[] = [
   },
 ];
 
-export default function SenderParcelTable() {
+export default function ReceiverHistoryParcelTable() {
   const id = useId();
-  const [open, setOpen] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    Sender: false,
+    Receiver: false,
     currentLocation: false,
     createdAt: false,
     cancelledAt: false,
@@ -365,7 +329,7 @@ export default function SenderParcelTable() {
     currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
   };
 
-  const { data: senderParcels } = useGetSenderParcelsQuery({
+  const { data: incomingParcels } = useGetReceiverParcelHistoryQuery({
     ...currentQuery,
   });
 
@@ -394,12 +358,12 @@ export default function SenderParcelTable() {
   };
 
   const table = useReactTable({
-    data: senderParcels?.data || [],
+    data: incomingParcels?.data || [],
     columns,
     // Server-side pagination configuration
     manualPagination: true,
-    pageCount: senderParcels?.meta?.totalPage,
-    rowCount: senderParcels?.meta?.total,
+    pageCount: incomingParcels?.meta?.totalPage,
+    rowCount: incomingParcels?.meta?.total,
 
     // Server-side sorting configuration
     manualSorting: true,
@@ -439,7 +403,7 @@ export default function SenderParcelTable() {
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Filter by tracking id */}
+          {/* Filter by tracking id / address */}
           <div className="relative">
             <Input
               // id={id}
@@ -566,22 +530,6 @@ export default function SenderParcelTable() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Send parcel button */}
-          <Button
-            onClick={() => setOpen(true)}
-            className="ml-auto"
-            variant="outline"
-          >
-            <PlusIcon
-              className="-ms-1 opacity-60"
-              size={16}
-              aria-hidden="true"
-            />
-            Send Parcel
-          </Button>
-          <CreateParcelDialog open={open} onOpenChange={setOpen} />
         </div>
       </div>
 
@@ -799,50 +747,20 @@ export default function SenderParcelTable() {
 }
 
 function RowActions({ row }: { row: Row<IParcel> }) {
-  const [open, setOpen] = useState(false);
-  const form = useForm<z.infer<typeof cancelNoteSchema>>({
-    resolver: zodResolver(cancelNoteSchema),
-    defaultValues: { note: "" },
-  });
-  const [cancelParcel, { isLoading, isError, error }] =
-    useCancelParcelMutation();
   const [
-    deleteParcel,
-    { isLoading: isDeleting, isError: isDeleteError, error: deleteError },
-  ] = useDeleteParcelMutation();
+    confirmParcelDelivery,
+    { isLoading: isConfirming, isError: isConfirmError, error: confirmError },
+  ] = useConfirmParcelDeliveryMutation();
 
-  // Cancel Parcel
-  const handleCancel = async (data: z.infer<typeof cancelNoteSchema>) => {
+  // Confirm Delivery
+  const handleConfirmDelivery = async (row: Row<IParcel>) => {
     try {
-      const res = await cancelParcel({
-        id: row.original._id,
-        note: data.note,
-      }).unwrap();
+      const res = await confirmParcelDelivery(row.original._id).unwrap();
 
       if (res.success) {
-        setOpen(false);
-        toast.success("Parcel canceled successfully");
-      }
-    } catch (error) {
-      console.error("Failed to cancel parcel", error);
-    }
-  };
-
-  useEffect(() => {
-    if (isError) {
-      toast.error("Failed to cancel parcel", {
-        description: error?.data?.message,
-      });
-    }
-  }, [isError, error]);
-
-  // Delete Parcel
-  const handleDelete = async (row: Row<IParcel>) => {
-    try {
-      const res = await deleteParcel(row.original._id).unwrap();
-
-      if (res.success) {
-        toast.success("Parcel deleted successfully");
+        toast.success(
+          "Parcel confirmed successfully. You can find it in Delivery History."
+        );
       }
     } catch (error) {
       console.error("Failed to delete parcel", error);
@@ -850,12 +768,12 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   };
 
   useEffect(() => {
-    if (isDeleteError) {
-      toast.error("Failed to delete parcel", {
-        description: deleteError?.data?.message,
+    if (isConfirmError) {
+      toast.error("Failed to confirm parcel", {
+        description: confirmError?.data?.message,
       });
     }
-  }, [isDeleteError, deleteError]);
+  }, [isConfirmError, confirmError]);
 
   return (
     <DropdownMenu>
@@ -872,79 +790,23 @@ function RowActions({ row }: { row: Row<IParcel> }) {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Link to={`/sender/${row.original._id}/status`}>
-              <span>Show Status</span>
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <span>Cancel</span>
-              </DropdownMenuItem>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Confirm Cancellation</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to cancel this parcel? This action
-                  cannot be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(handleCancel)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="note"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Reason</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter reason" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline" type="button">
-                        Don't Cancel
-                      </Button>
-                    </DialogClose>
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Cancelling..." : "Cancel Parcel"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <DeleteConfirmation
             trigger={
               <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
+                className="focus:text-destructive"
                 onSelect={(e) => e.preventDefault()}
               >
-                <span>Delete</span>
+                <span>Confirm Delivery</span>
               </DropdownMenuItem>
             }
-            title="Are you absolutely sure?"
-            description={`This action cannot be undone. This will permanently delete the parcel`}
+            title="Are you sure?"
+            description={`Are you sure you want to confirm this parcel delivery?`}
             onConfirm={() => {
-              handleDelete(row);
+              handleConfirmDelivery(row);
             }}
-            isLoading={isDeleting}
+            isLoading={isConfirming}
+            confirmText="Yes, confirm"
           />
         </DropdownMenuItem>
       </DropdownMenuContent>

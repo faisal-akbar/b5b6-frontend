@@ -26,7 +26,7 @@ export enum ShippingType {
   OVERNIGHT = "overnight",
 }
 
-export interface ISenderParcel {
+export interface IParcel {
   _id: string;
   trackingId: string;
   type: ParcelType;
@@ -79,7 +79,7 @@ export interface UpdatedBy {
   role: string;
 }
 
-export interface ISenderParcelParams {
+export interface IParcelParams {
   searchTerm?: string;
   page: number;
   limit: number;

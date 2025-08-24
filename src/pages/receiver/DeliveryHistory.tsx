@@ -1,5 +1,7 @@
+import ReceiverHistoryParcelTable from "@/components/modules/receiver/ReceiverHistoryParcelTable";
+
 function DeliveryHistory() {
-  return <div>DeliveryHistory</div>;
+  return <ReceiverHistoryParcelTable />;
 }
 
 export default DeliveryHistory;

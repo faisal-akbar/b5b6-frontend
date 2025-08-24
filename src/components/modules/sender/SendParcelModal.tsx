@@ -1,50 +1,287 @@
-import { Button } from "@/components/ui/button";
+// components/CreateUserDialog.tsx
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-export function SendParcelModal() {
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { useCreateParcelMutation } from "@/redux/features/parcel/parcelApi";
+import { ParcelType, ShippingType } from "@/types/sender-parcel-type";
+import { InfoIcon } from "lucide-react";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  type: z.enum(Object.values(ParcelType) as [string]).optional(),
+  shippingType: z.enum(Object.values(ShippingType) as [string]).optional(),
+  weight: z.coerce
+    .number({ error: "Weight must be a number" })
+    .min(0.1, { message: "Weight must be at least 0.1 kg" })
+    .max(10, { message: "Weight cannot exceed 10 kg" }),
+  couponCode: z
+    .string({ error: "Coupon code must be a string" })
+    .max(20, { message: "Coupon code cannot exceed 20 characters" })
+    .optional(),
+  receiverEmail: z
+    .email({ message: "Invalid email address format." })
+    .min(5, { message: "Email must be at least 5 characters long." })
+    .max(100, { message: "Email cannot exceed 100 characters." }),
+  pickupAddress: z
+    .string({ error: "Pickup address must be string" })
+    .max(100, { message: "Pickup address cannot exceed 100 characters." })
+    .optional(),
+  deliveryAddress: z
+    .string({ error: "Delivery address must be string" })
+    .max(100, { message: "Delivery address cannot exceed 100 characters." })
+    .optional(),
+});
+
+type FormValues = {
+  type?: string;
+  shippingType?: string;
+  weight: unknown;
+  couponCode?: string;
+  receiverEmail: string;
+  pickupAddress?: string;
+  deliveryAddress?: string;
+};
+
+interface CreateParcelDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function CreateParcelDialog({
+  open,
+  onOpenChange,
+}: CreateParcelDialogProps) {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      receiverEmail: "",
+      pickupAddress: "",
+      deliveryAddress: "",
+      weight: 0.1,
+      type: ParcelType.PACKAGE,
+      shippingType: ShippingType.STANDARD,
+      couponCode: "",
+    },
+  });
+
+  const [createParcel, { isLoading }] = useCreateParcelMutation();
+
+  const onSubmit = async (values: FormValues) => {
+    try {
+      await createParcel(values).unwrap();
+      form.reset();
+      onOpenChange(false); // close after success
+      toast.success("Parcel created successfully");
+    } catch (error) {
+      console.error("Failed to create parcel:", error);
+      toast.error("Failed to create parcel", {
+        description: error?.data?.message || "Please try again.",
+      });
+    }
+  };
+
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="outline">Open Dialog</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="name-1">Name</Label>
-              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Parcel</DialogTitle>
+          <DialogDescription>
+            Fill out the form to send a parcel.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="receiverEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Receiver Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="john@example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="pickupAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pickup Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="absolute -inset-y-2 start-26 text-muted-foreground/80">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <InfoIcon size={14} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>If empty, system will use your default address</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
-            <div className="grid gap-3">
-              <Label htmlFor="username-1">Username</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
+
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="deliveryAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Delivery Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="absolute -inset-y-2 start-28 text-muted-foreground/80">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <InfoIcon size={14} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      If empty, system will use your receiver default address
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+
+            <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Weight (kg)</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.1" min="0.1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parcel Type</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select parcel type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(ParcelType).map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="shippingType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Shipping Type</FormLabel>
+                  <FormControl>
+                    <Select {...field}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select shipping type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(ShippingType).map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="couponCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Coupon Code</FormLabel>
+                  <FormControl>
+                    <Input placeholder="" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter className="flex justify-between items-center">
+              {isLoading && <Spinner variant={"circle-filled"} />}
+              <Button type="submit" disabled={isLoading}>
+                Submit
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 }
