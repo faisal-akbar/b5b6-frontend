@@ -5,7 +5,6 @@ import {
   getCoreRowModel,
   getFacetedUniqueValues,
   PaginationState,
-  Row,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -19,8 +18,6 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
   Columns3Icon,
-  EllipsisIcon,
-  FilterIcon,
   InfoIcon,
   Package,
   Scale,
@@ -28,18 +25,15 @@ import {
   Truck,
   XIcon,
 } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 
-import DeleteConfirmation from "@/components/DeleteConformation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -50,11 +44,6 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@/components/ui/pagination";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -76,16 +65,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import {
-  useConfirmParcelDeliveryMutation,
-  useGetReceiverParcelHistoryQuery,
-} from "@/redux/features/parcel/parcelApi";
+import { useGetReceiverParcelHistoryQuery } from "@/redux/features/parcel/parcelApi";
 import { IParcel } from "@/types";
-import { ParcelStatus } from "@/types/sender-parcel-type";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { format } from "date-fns";
-import { toast } from "sonner";
 
 const columns: ColumnDef<IParcel>[] = [
   {
@@ -291,19 +275,11 @@ const columns: ColumnDef<IParcel>[] = [
     enableHiding: true,
     enableSorting: true,
   },
-  {
-    id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
-    cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
-    enableHiding: false,
-  },
 ];
 
 export default function ReceiverHistoryParcelTable() {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     Receiver: false,
     currentLocation: false,
@@ -326,7 +302,6 @@ export default function ReceiverHistoryParcelTable() {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
     sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
-    currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
   };
 
   const { data: incomingParcels } = useGetReceiverParcelHistoryQuery({
@@ -345,18 +320,6 @@ export default function ReceiverHistoryParcelTable() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
-  // handleStatusChange function
-  const handleStatusChange = (checked: boolean, value: ParcelStatus) => {
-    setStatusFilter((prev) => {
-      if (checked) {
-        return [...prev, value];
-      } else {
-        return prev.filter((status) => status !== value);
-      }
-    });
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  };
-
   const table = useReactTable({
     data: incomingParcels?.data || [],
     columns,
@@ -371,7 +334,7 @@ export default function ReceiverHistoryParcelTable() {
     enableMultiSort: false,
 
     // manual filtering
-    manualFiltering: true,
+    // manualFiltering: true,
 
     getCoreRowModel: getCoreRowModel(),
     // getSortedRowModel: getSortedRowModel(),
@@ -452,50 +415,6 @@ export default function ReceiverHistoryParcelTable() {
             </div>
           </div>
 
-          {/* Filter by status */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                Status
-                {statusFilter.length > 0 && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {statusFilter.length}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-36 p-3" align="start">
-              <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">
-                  Filters
-                </div>
-                <div className="space-y-3">
-                  {Object.values(ParcelStatus).map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`status-${i}`}
-                        checked={statusFilter.includes(value)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleStatusChange(checked, value)
-                        }
-                      />
-                      <Label
-                        htmlFor={`status-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
-                        {value}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -743,73 +662,5 @@ export default function ReceiverHistoryParcelTable() {
         </div>
       </div>
     </div>
-  );
-}
-
-function RowActions({ row }: { row: Row<IParcel> }) {
-  const [
-    confirmParcelDelivery,
-    { isLoading: isConfirming, isError: isConfirmError, error: confirmError },
-  ] = useConfirmParcelDeliveryMutation();
-
-  // Confirm Delivery
-  const handleConfirmDelivery = async (row: Row<IParcel>) => {
-    try {
-      const res = await confirmParcelDelivery(row.original._id).unwrap();
-
-      if (res.success) {
-        toast.success(
-          "Parcel confirmed successfully. You can find it in Delivery History."
-        );
-      }
-    } catch (error) {
-      console.error("Failed to delete parcel", error);
-    }
-  };
-
-  useEffect(() => {
-    if (isConfirmError) {
-      toast.error("Failed to confirm parcel", {
-        description: confirmError?.data?.message,
-      });
-    }
-  }, [isConfirmError, confirmError]);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="shadow-none"
-            aria-label="Edit item"
-          >
-            <EllipsisIcon size={16} aria-hidden="true" />
-          </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <DeleteConfirmation
-            trigger={
-              <DropdownMenuItem
-                className="focus:text-destructive"
-                onSelect={(e) => e.preventDefault()}
-              >
-                <span>Confirm Delivery</span>
-              </DropdownMenuItem>
-            }
-            title="Are you sure?"
-            description={`Are you sure you want to confirm this parcel delivery?`}
-            onConfirm={() => {
-              handleConfirmDelivery(row);
-            }}
-            isLoading={isConfirming}
-            confirmText="Yes, confirm"
-          />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }
