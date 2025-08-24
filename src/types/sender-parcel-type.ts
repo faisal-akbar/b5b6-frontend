@@ -48,7 +48,7 @@ export interface IParcel {
   cancelledAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  deliveryPersonnel?: any[];
+  deliveryPersonnel?: string[];
   isBlocked?: boolean;
 }
 

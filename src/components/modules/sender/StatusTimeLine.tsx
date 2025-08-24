@@ -1,16 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { IStatusLog } from "@/types";
 import { format } from "date-fns";
 import {
   CheckCircle,
   Clock,
   Flag,
-  InfoIcon,
   Package,
   Shield,
   Truck,
@@ -66,9 +60,9 @@ const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                 </div>
                 <div className="flex-1 pb-6">
                   <div className=" flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                    <h4 className="relative font-semibold mb-2 md:mb-0">
+                    <h4 className="font-semibold mb-2 md:mb-0">
                       {item.status}
-                      <div className="absolute -inset-y-2 -end-4 text-muted-foreground/80">
+                      {/* <div className="absolute -inset-y-2 -end-4 text-muted-foreground/80">
                         <Tooltip>
                           <TooltipTrigger>
                             <InfoIcon size={14} />
@@ -80,7 +74,7 @@ const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                             </p>
                           </TooltipContent>
                         </Tooltip>
-                      </div>
+                      </div> */}
                     </h4>
 
                     <span className="text-sm text-muted-foreground">
@@ -94,6 +88,11 @@ const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                   {item.location && (
                     <p className="text-sm text-muted-foreground mb-1">
                       {item.location}
+                    </p>
+                  )}
+                  {item.updatedBy && (
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Updated by: {item.updatedBy}
                     </p>
                   )}
                   <p className="text-sm">{item.note}</p>

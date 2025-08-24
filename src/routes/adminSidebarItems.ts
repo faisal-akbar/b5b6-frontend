@@ -5,18 +5,8 @@ import { lazy } from "react";
 
 const Analytics = lazy(() => import("@/pages/admin/analytics/Analytics"));
 const AllUsers = lazy(() => import("@/pages/admin/user/AllUsers"));
-const BlockUser = lazy(() => import("@/pages/admin/user/BlockUser"));
-const CreateDeliveryPersonnel = lazy(
-  () => import("@/pages/admin/user/CreateDeliveryPersonnel")
-);
-const CreateAdmin = lazy(() => import("@/pages/admin/user/CreateAdmin"));
+
 const ViewParcels = lazy(() => import("@/pages/admin/parcels/ViewParcels"));
-const ViewParcel = lazy(() => import("@/pages/admin/parcels/ViewParcel"));
-const UpdateDeliveryStatus = lazy(
-  () => import("@/pages/admin/parcels/UpdateDeliveryStatus")
-);
-const BlockParcel = lazy(() => import("@/pages/admin/parcels/BlockParcel"));
-const CreateParcel = lazy(() => import("@/pages/admin/parcels/CreateParcel"));
 
 export const adminSidebarItems: ISidebarItem[] = [
   {
@@ -51,26 +41,6 @@ export const adminSidebarItems: ISidebarItem[] = [
         title: "View All Parcels",
         url: "/admin/parcels",
         component: ViewParcels,
-      },
-      {
-        title: "View Parcel",
-        url: "/admin/parcels/:id",
-        component: ViewParcel,
-      },
-      {
-        title: "Update Delivery Status",
-        url: "/admin/parcels/:id/delivery-status",
-        component: UpdateDeliveryStatus,
-      },
-      {
-        title: "Block Parcel",
-        url: "/admin/parcels/:id/block-status",
-        component: BlockParcel,
-      },
-      {
-        title: "Create Parcel",
-        url: "/admin/parcels/create-parcel",
-        component: CreateParcel,
       },
     ],
   },

@@ -12,5 +12,6 @@ export interface IStatusLog {
   status: string;
   location: string;
   note: string;
+  updatedBy?: string;
   updatedAt: string;
 }
