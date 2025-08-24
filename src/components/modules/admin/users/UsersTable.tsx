@@ -109,7 +109,7 @@ import { format } from "date-fns";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
-import { CreateParcelDialog } from "../../sender/SendParcelModal";
+import { CreateStuffDialog } from "./CreateStuff";
 
 // schema for cancel note
 const cancelNoteSchema = z.object({
@@ -586,8 +586,9 @@ export default function UsersTable() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
         <div className="flex items-center gap-3">
-          {/* Send parcel button */}
+          {/* Create button */}
           <Button
             onClick={() => setOpen(true)}
             className="ml-auto"
@@ -598,9 +599,9 @@ export default function UsersTable() {
               size={16}
               aria-hidden="true"
             />
-            Send Parcel
+            Create Stuff
           </Button>
-          <CreateParcelDialog open={open} onOpenChange={setOpen} />
+          <CreateStuffDialog open={open} onOpenChange={setOpen} />
         </div>
       </div>
 

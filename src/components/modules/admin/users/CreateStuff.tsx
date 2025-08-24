@@ -1,3 +1,18 @@
+// components/CreateUserDialog.tsx
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,104 +32,82 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { useRegisterMutation } from "@/redux/features/user/userApi";
+import {
+  useCreateAdminMutation,
+  useCreateDeliveryPersonnelMutation,
+} from "@/redux/features/user/userApi";
 import { Role } from "@/types/user-type";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { z } from "zod";
+import { registerSchema } from "../../authentication/RegisterForm";
 
-export const registerSchema = z
-  .object({
-    name: z
-      .string()
-      .min(3, {
-        error: "Name is too short",
-      })
-      .max(50),
-    email: z.email(),
-    password: z
-      .string({ error: "Password must be string" })
-      .min(8, { message: "Password must be at least 8 characters long." })
-      .regex(/^(?=.*[A-Z])/, {
-        message: "Password must contain at least 1 uppercase letter.",
-      })
-      .regex(/^(?=.*[!@#$%^&*])/, {
-        message: "Password must contain at least 1 special character.",
-      })
-      .regex(/^(?=.*\d)/, {
-        message: "Password must contain at least 1 number.",
-      }),
-    confirmPassword: z
-      .string()
-      .min(8, { error: "Confirm Password is too short" }),
-    role: z.enum([Role.SENDER, Role.RECEIVER]),
-    defaultAddress: z.string().min(5).max(200).optional(),
-    phone: z
-      .string({ error: "Phone Number must be string" })
-      .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-        message:
-          "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
-      })
-      .optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Password do not match",
-    path: ["confirmPassword"],
-  });
+const createStuffZodSchema = registerSchema.extend({
+  role: z.literal([Role.ADMIN, Role.DELIVERY_PERSONNEL]),
+});
 
-export function RegisterForm({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const [register] = useRegisterMutation();
-  const navigate = useNavigate();
+type FormValues = z.infer<typeof createStuffZodSchema>;
 
-  const form = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+interface CreateDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(createStuffZodSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
       confirmPassword: "",
-      role: Role.SENDER,
+      role: Role.DELIVERY_PERSONNEL,
       defaultAddress: "",
       phone: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof registerSchema>) => {
-    const userInfo = {
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      role: data.role,
-      defaultAddress: data.defaultAddress,
-      phone: data.phone,
-    };
+  const [createDeliveryPersonnel, { isLoading: isDeliveryPersonnelLoading }] =
+    useCreateDeliveryPersonnelMutation();
 
-    try {
-      await register(userInfo).unwrap();
+  const [createAdmin, { isLoading: isAdminLoading }] = useCreateAdminMutation();
 
-      toast.success("User created successfully");
-      navigate("/verify", { state: { email: data.email } });
-    } catch (error) {
-      console.error(error);
+  const onSubmit = async (values: FormValues) => {
+    if (values.role === Role.DELIVERY_PERSONNEL) {
+      try {
+        await createDeliveryPersonnel(values).unwrap();
+        form.reset();
+        onOpenChange(false); // close after success
+        toast.success("Delivery personnel created successfully");
+      } catch (error) {
+        console.error("Failed to create delivery personnel:", error);
+        toast.error("Failed to create delivery personnel", {
+          description: error?.data?.message || "Please try again.",
+        });
+      }
+    } else {
+      try {
+        await createAdmin(values).unwrap();
+        form.reset();
+        onOpenChange(false); // close after success
+        toast.success("Admin created successfully");
+      } catch (error) {
+        console.error("Failed to create admin:", error);
+        toast.error("Failed to create admin", {
+          description: error?.data?.message || "Please try again.",
+        });
+      }
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Register your account</h1>
-        <p className="text-sm text-muted-foreground">
-          Enter your details to create an account
-        </p>
-      </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Stuff</DialogTitle>
+          <DialogDescription>
+            Fill out the form to create stuff.
+          </DialogDescription>
+        </DialogHeader>
 
-      <div className="grid gap-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -201,8 +194,10 @@ export function RegisterForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="SENDER">Sender</SelectItem>
-                      <SelectItem value="RECEIVER">Receiver</SelectItem>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="DELIVERY_PERSONNEL">
+                        Delivery Personnel
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription className="sr-only">
@@ -251,14 +246,7 @@ export function RegisterForm({
             </Button>
           </form>
         </Form>
-      </div>
-
-      <div className="text-center text-sm">
-        Already have an account?{" "}
-        <Link to="/login" className="underline underline-offset-4">
-          Login
-        </Link>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
