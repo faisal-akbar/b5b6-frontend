@@ -1,5 +1,7 @@
+import AdminParcelsTable from "@/components/modules/admin/parcels/AdminParcelsTable";
+
 function ViewParcels() {
-  return <div>ViewParcels</div>;
+  return <AdminParcelsTable />;
 }
 
 export default ViewParcels;

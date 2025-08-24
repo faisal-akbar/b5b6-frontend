@@ -31,6 +31,7 @@ export const userApi = baseApi.injectEndpoints({
         method: "POST",
         data,
       }),
+      invalidatesTags: ["USER"],
     }),
     createDeliveryPersonnel: builder.mutation({
       query: (data) => ({
@@ -38,6 +39,7 @@ export const userApi = baseApi.injectEndpoints({
         method: "POST",
         data,
       }),
+      invalidatesTags: ["USER"],
     }),
     getUserById: builder.query({
       query: (id) => ({
@@ -55,9 +57,10 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ["USER"],
     }),
     blockUserById: builder.mutation({
-      query: (id) => ({
+      query: ({ id, data }) => ({
         url: `/user/${id}/block-user`,
         method: "PATCH",
+        data,
       }),
       invalidatesTags: ["USER"],
     }),

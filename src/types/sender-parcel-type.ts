@@ -49,6 +49,7 @@ export interface IParcel {
   createdAt: Date;
   updatedAt: Date;
   deliveryPersonnel?: any[];
+  isBlocked?: boolean;
 }
 
 export interface Sender {

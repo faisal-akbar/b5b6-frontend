@@ -93,12 +93,14 @@ export const parcelApi = baseApi.injectEndpoints({
         url: "/parcels",
         method: "GET",
       }),
+      providesTags: ["ALL_PARCEL"],
     }),
     getParcelById: builder.query({
       query: (id) => ({
         url: `/parcels/${id}`,
         method: "GET",
       }),
+      providesTags: ["ALL_PARCEL"],
     }),
     updateStatusAndPersonnel: builder.mutation({
       query: ({ id, data }) => ({
@@ -106,12 +108,15 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "PATCH",
         data,
       }),
+      invalidatesTags: ["ALL_PARCEL"],
     }),
     blockParcel: builder.mutation({
-      query: (id) => ({
+      query: ({ id, data }) => ({
         url: `/parcels/${id}/block-status`,
         method: "PATCH",
+        data,
       }),
+      invalidatesTags: ["ALL_PARCEL"],
     }),
     adminCreateParcel: builder.mutation({
       query: (data) => ({
@@ -119,6 +124,7 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "POST",
         data,
       }),
+      invalidatesTags: ["ALL_PARCEL"],
     }),
     // public
     trackParcel: builder.query<IResponse<IParcelTrackData>, string>({
@@ -126,6 +132,7 @@ export const parcelApi = baseApi.injectEndpoints({
         url: `/parcels/tracking/${trackingId}`,
         method: "GET",
       }),
+      providesTags: ["ALL_PARCEL", "SENDER_PARCEL", "RECEIVER_PARCEL"],
     }),
   }),
 });

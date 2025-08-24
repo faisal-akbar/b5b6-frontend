@@ -42,26 +42,6 @@ export const adminSidebarItems: ISidebarItem[] = [
         url: "/admin/all-users",
         component: AllUsers,
       },
-      {
-        title: "View User",
-        url: "/admin/user/:id",
-        component: AllUsers,
-      },
-      {
-        title: "Block User",
-        url: "/admin/block-user",
-        component: BlockUser,
-      },
-      {
-        title: "Create Delivery Personnel",
-        url: "/admin/create-delivery-personnel",
-        component: CreateDeliveryPersonnel,
-      },
-      {
-        title: "Create Admin",
-        url: "/admin/create-admin",
-        component: CreateAdmin,
-      },
     ],
   },
   {
