@@ -88,10 +88,11 @@ export const parcelApi = baseApi.injectEndpoints({
       invalidatesTags: ["RECEIVER_PARCEL"],
     }),
     // admin
-    getAllParcels: builder.query({
-      query: () => ({
+    getAllParcels: builder.query<IResponse<IParcel[]>, IParcelParams>({
+      query: (params) => ({
         url: "/parcels",
         method: "GET",
+        params,
       }),
       providesTags: ["ALL_PARCEL"],
     }),

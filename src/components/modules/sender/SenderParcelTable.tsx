@@ -126,9 +126,9 @@ const cancelNoteSchema = z.object({
 const columns: ColumnDef<IParcel>[] = [
   {
     header: "Sender",
-    accessorKey: "Sender",
+    accessorKey: "sender",
     cell: ({ row }) => {
-      const name = row.original.sender.name;
+      const name = row.original?.sender?.name;
       const initials = getNameInitials(name);
 
       return (
@@ -139,13 +139,13 @@ const columns: ColumnDef<IParcel>[] = [
           <div className="space-y-1">
             <div className="font-medium">{name}</div>
             <div className="text-sm text-muted-foreground">
-              {row.original.pickupAddress}
+              {row.original?.pickupAddress}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.sender.email}
+              {row.original?.sender?.email}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.sender.phone}
+              {row.original?.sender?.phone}
             </div>
           </div>
         </div>
@@ -157,9 +157,9 @@ const columns: ColumnDef<IParcel>[] = [
   },
   {
     header: "Receiver",
-    accessorKey: "Receiver",
+    accessorKey: "receiver",
     cell: ({ row }) => {
-      const name = row.original.receiver.name;
+      const name = row.original?.receiver?.name;
       const initials = getNameInitials(name);
       return (
         <div className="flex items-start gap-3">
@@ -167,15 +167,15 @@ const columns: ColumnDef<IParcel>[] = [
             <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
           </Avatar>
           <div className="space-y-1">
-            <div className="font-medium">{row.original.receiver.name}</div>
+            <div className="font-medium">{row.original?.receiver?.name}</div>
             <div className="text-sm text-muted-foreground">
-              {row.original.deliveryAddress}
+              {row.original?.deliveryAddress}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.receiver.email}
+              {row.original?.receiver?.email}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.receiver.phone}
+              {row.original?.receiver?.phone}
             </div>
           </div>
         </div>
@@ -196,11 +196,13 @@ const columns: ColumnDef<IParcel>[] = [
     enableSorting: true,
   },
   {
-    header: "Deliver At",
-    accessorKey: "deliverAt",
+    header: "Delivered At",
+    accessorKey: "deliveredAt",
     cell: ({ row }) => {
-      const deliverAt = row.getValue("deliverAt");
-      return <div>{deliverAt ? format(deliverAt as Date, "PPP") : "-"}</div>;
+      const deliveredAt = row.getValue("deliveredAt");
+      return (
+        <div>{deliveredAt ? format(deliveredAt as Date, "PPP") : "-"}</div>
+      );
     },
     size: 165,
     enableHiding: true,
@@ -224,17 +226,17 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Parcel Info",
     accessorKey: "weight",
     cell: ({ row }) => {
-      const packageType = `${row.original.type
+      const packageType = `${row.original?.type
         .charAt(0)
-        .toUpperCase()}${row.original.type.slice(1)}`;
-      const shippingType = `${row.original.shippingType
+        .toUpperCase()}${row.original?.type.slice(1)}`;
+      const shippingType = `${row.original?.shippingType
         .charAt(0)
-        .toUpperCase()}${row.original.shippingType.slice(1)}`;
+        .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
         <div className="space-y-1">
           <div className="font-medium flex items-center gap-2">
             <Scale className="h-4 w-4" />
-            {row.original.weight} {row.original.weightUnit}
+            {row.original?.weight} {row.original?.weightUnit}
           </div>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <Package className="h-4 w-4" />
@@ -276,7 +278,7 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Paid",
     accessorKey: "isPaid",
     cell: ({ row }) => {
-      return <div>{row.original.isPaid ? "Yes" : "No"}</div>;
+      return <div>{row.original?.isPaid ? "Yes" : "No"}</div>;
     },
     size: 100,
     enableHiding: true,
@@ -341,7 +343,7 @@ export default function SenderParcelTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    Sender: false,
+    sender: false,
     currentLocation: false,
     createdAt: false,
     cancelledAt: false,
@@ -815,7 +817,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   const handleCancel = async (data: z.infer<typeof cancelNoteSchema>) => {
     try {
       const res = await cancelParcel({
-        id: row.original._id,
+        id: row.original?._id,
         note: data.note,
       }).unwrap();
 
@@ -839,7 +841,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   // Delete Parcel
   const handleDelete = async (row: Row<IParcel>) => {
     try {
-      const res = await deleteParcel(row.original._id).unwrap();
+      const res = await deleteParcel(row.original?._id).unwrap();
 
       if (res.success) {
         toast.success("Parcel deleted successfully");
@@ -874,7 +876,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link to={`/sender/${row.original._id}/status`}>
+            <Link to={`/sender/${row.original?._id}/status`}>
               <span>Show Status</span>
             </Link>
           </DropdownMenuItem>

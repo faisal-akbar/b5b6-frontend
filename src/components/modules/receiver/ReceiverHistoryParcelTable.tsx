@@ -74,7 +74,7 @@ import { format } from "date-fns";
 const columns: ColumnDef<IParcel>[] = [
   {
     header: "Sender",
-    accessorKey: "Sender",
+    accessorKey: "sender",
     cell: ({ row }) => {
       const name = row?.original?.sender?.name;
       const initials = getNameInitials(name);
@@ -91,10 +91,10 @@ const columns: ColumnDef<IParcel>[] = [
               {row.original?.pickupAddress}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.sender?.email}
+              {row.original?.sender?.email}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.sender?.phone}
+              {row.original?.sender?.phone}
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@ const columns: ColumnDef<IParcel>[] = [
   },
   {
     header: "Receiver",
-    accessorKey: "Receiver",
+    accessorKey: "receiver",
     cell: ({ row }) => {
       const name = row.original?.receiver?.name;
       const initials = getNameInitials(name);
@@ -121,10 +121,10 @@ const columns: ColumnDef<IParcel>[] = [
               {row.original?.deliveryAddress}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.receiver?.email}
+              {row.original?.receiver?.email}
             </div>
             <div className="text-sm text-muted-foreground">
-              {row.original.receiver?.phone}
+              {row.original?.receiver?.phone}
             </div>
           </div>
         </div>
@@ -146,10 +146,12 @@ const columns: ColumnDef<IParcel>[] = [
   },
   {
     header: "Deliver At",
-    accessorKey: "deliverAt",
+    accessorKey: "deliveredAt",
     cell: ({ row }) => {
-      const deliverAt = row.getValue("deliverAt");
-      return <div>{deliverAt ? format(deliverAt as Date, "PPP") : "-"}</div>;
+      const deliveredAt = row.getValue("deliveredAt");
+      return (
+        <div>{deliveredAt ? format(deliveredAt as Date, "PPP") : "-"}</div>
+      );
     },
     size: 165,
     enableHiding: true,
@@ -173,17 +175,17 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Parcel Info",
     accessorKey: "weight",
     cell: ({ row }) => {
-      const packageType = `${row.original.type
+      const packageType = `${row.original?.type
         .charAt(0)
-        .toUpperCase()}${row.original.type.slice(1)}`;
-      const shippingType = `${row.original.shippingType
+        .toUpperCase()}${row.original?.type.slice(1)}`;
+      const shippingType = `${row.original?.shippingType
         .charAt(0)
-        .toUpperCase()}${row.original.shippingType.slice(1)}`;
+        .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
         <div className="space-y-1">
           <div className="font-medium flex items-center gap-2">
             <Scale className="h-4 w-4" />
-            {row.original.weight} {row.original.weightUnit}
+            {row.original?.weight} {row.original?.weightUnit}
           </div>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <Package className="h-4 w-4" />
@@ -225,7 +227,7 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Paid",
     accessorKey: "isPaid",
     cell: ({ row }) => {
-      return <div>{row.original.isPaid ? "Yes" : "No"}</div>;
+      return <div>{row.original?.isPaid ? "Yes" : "No"}</div>;
     },
     size: 100,
     enableHiding: true,
@@ -281,7 +283,7 @@ export default function ReceiverHistoryParcelTable() {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    Receiver: false,
+    receiver: false,
     currentLocation: false,
     createdAt: false,
     cancelledAt: false,

@@ -40,6 +40,7 @@ import {
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -101,15 +102,18 @@ import {
   useUpdateStatusAndPersonnelMutation,
 } from "@/redux/features/parcel/parcelApi";
 import { IParcel } from "@/types";
-import { ParcelStatus } from "@/types/sender-parcel-type";
+import {
+  ParcelStatus,
+  ParcelType,
+  ShippingType,
+} from "@/types/sender-parcel-type";
+import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import z from "zod";
 import { AdminCreateParcelDialog } from "./AdminParcelModal";
-
-// schema for ca
 
 const updateStatusPersonnelSchema = z.object({
   currentStatus: z.enum(Object.values(ParcelStatus) as [string]).optional(),
@@ -129,7 +133,28 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Sender",
     accessorKey: "sender",
     cell: ({ row }) => {
-      return <div>{row.getValue("sender")}</div>;
+      const name = row.original?.sender?.name;
+      const initials = getNameInitials(name);
+
+      return (
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <div className="font-medium">{name}</div>
+            <div className="text-sm text-muted-foreground">
+              {row.original?.pickupAddress}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original?.sender?.email}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original?.sender?.phone}
+            </div>
+          </div>
+        </div>
+      );
     },
     size: 210,
     enableHiding: true,
@@ -139,27 +164,27 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Receiver",
     accessorKey: "receiver",
     cell: ({ row }) => {
-      return <div>{row.getValue("receiver")}</div>;
-    },
-    size: 210,
-    enableHiding: true,
-    enableSorting: false,
-  },
-  {
-    header: "Pickup Address",
-    accessorKey: "pickupAddress",
-    cell: ({ row }) => {
-      return <div>{row.getValue("pickupAddress")}</div>;
-    },
-    size: 210,
-    enableHiding: true,
-    enableSorting: false,
-  },
-  {
-    header: "Delivery Address",
-    accessorKey: "deliveryAddress",
-    cell: ({ row }) => {
-      return <div>{row.getValue("deliveryAddress")}</div>;
+      const name = row.original?.receiver?.name;
+      const initials = getNameInitials(name);
+      return (
+        <div className="flex items-start gap-3">
+          <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <div className="font-medium">{row.original?.receiver?.name}</div>
+            <div className="text-sm text-muted-foreground">
+              {row.original?.deliveryAddress}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original?.receiver?.email}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {row.original?.receiver?.phone}
+            </div>
+          </div>
+        </div>
+      );
     },
     size: 210,
     enableHiding: true,
@@ -176,11 +201,13 @@ const columns: ColumnDef<IParcel>[] = [
     enableSorting: true,
   },
   {
-    header: "Deliver At",
-    accessorKey: "deliverAt",
+    header: "Delivered At",
+    accessorKey: "deliveredAt",
     cell: ({ row }) => {
-      const deliverAt = row.getValue("deliverAt");
-      return <div>{deliverAt ? format(deliverAt as Date, "PPP") : "-"}</div>;
+      const deliveredAt = row.getValue("deliveredAt");
+      return (
+        <div>{deliveredAt ? format(deliveredAt as Date, "PPP") : "-"}</div>
+      );
     },
     size: 165,
     enableHiding: true,
@@ -204,17 +231,17 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Parcel Info",
     accessorKey: "weight",
     cell: ({ row }) => {
-      const packageType = `${row.original.type
+      const packageType = `${row.original?.type
         .charAt(0)
-        .toUpperCase()}${row.original.type.slice(1)}`;
-      const shippingType = `${row.original.shippingType
+        .toUpperCase()}${row.original?.type.slice(1)}`;
+      const shippingType = `${row.original?.shippingType
         .charAt(0)
-        .toUpperCase()}${row.original.shippingType.slice(1)}`;
+        .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
         <div className="space-y-1">
           <div className="font-medium flex items-center gap-2">
             <Scale className="h-4 w-4" />
-            {row.original.weight} {row.original.weightUnit}
+            {row.original?.weight} {row.original?.weightUnit}
           </div>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <Package className="h-4 w-4" />
@@ -256,7 +283,7 @@ const columns: ColumnDef<IParcel>[] = [
     header: "Paid",
     accessorKey: "isPaid",
     cell: ({ row }) => {
-      return <div>{row.original.isPaid ? "Yes" : "No"}</div>;
+      return <div>{row.original?.isPaid ? "Yes" : "No"}</div>;
     },
     size: 100,
     enableHiding: true,
@@ -319,6 +346,39 @@ const columns: ColumnDef<IParcel>[] = [
   },
 
   {
+    header: "Delivery Personnel",
+    accessorKey: "deliveryPersonnel",
+    cell: ({ row }) => {
+      const deliveryPersonnel = row.getValue("deliveryPersonnel");
+      const personnelArray = Array.isArray(deliveryPersonnel)
+        ? deliveryPersonnel
+        : [];
+      return (
+        <>
+          {personnelArray.length > 0
+            ? personnelArray.map((personnel: any) => (
+                <div key={personnel.id}>{personnel.name}</div>
+              ))
+            : "-"}
+        </>
+      );
+    },
+    size: 180,
+    enableHiding: true,
+    enableSorting: true,
+  },
+  {
+    header: "Created At",
+    accessorKey: "createdAt",
+    cell: ({ row }) => {
+      return <div>{format(row.getValue("createdAt") as Date, "PPP")}</div>;
+    },
+    size: 180,
+    enableHiding: true,
+    enableSorting: true,
+  },
+
+  {
     header: "Status",
     accessorKey: "currentStatus",
     cell: ({ row }) => (
@@ -332,16 +392,6 @@ const columns: ColumnDef<IParcel>[] = [
   },
 
   {
-    header: "Created At",
-    accessorKey: "createdAt",
-    cell: ({ row }) => {
-      return <div>{format(row.getValue("createdAt") as Date, "PPP")}</div>;
-    },
-    size: 180,
-    enableHiding: true,
-    enableSorting: true,
-  },
-  {
     id: "actions",
     header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
@@ -354,15 +404,21 @@ export default function AdminParcelsTable() {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [typeFilter, setTypeFilter] = useState<ParcelType[]>([]);
+  const [shippingTypeFilter, setShippingTypeFilter] = useState<ShippingType[]>(
+    []
+  );
+  const [blockedParcelFilter, setBlockedParcelFilter] = useState<
+    boolean | undefined
+  >(undefined);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    sender: false,
-    receiver: false,
-    // currentLocation: true,
-    // createdAt: false,
+    currentLocation: false,
     trackingId: false,
     cancelledAt: false,
     coupon: false,
+    isPaid: false,
+    // deliveryPersonnel: false,
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -381,6 +437,11 @@ export default function AdminParcelsTable() {
     limit: pagination.pageSize,
     sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
     currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
+    type: typeFilter.length > 0 ? [...typeFilter] : undefined,
+    shippingType:
+      shippingTypeFilter.length > 0 ? [...shippingTypeFilter] : undefined,
+    isBlocked:
+      blockedParcelFilter !== undefined ? blockedParcelFilter : undefined,
   };
 
   const { data: senderParcels } = useGetAllParcelsQuery({
@@ -408,6 +469,33 @@ export default function AdminParcelsTable() {
         return prev.filter((status) => status !== value);
       }
     });
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const handleTypeChange = (checked: boolean, value: ParcelType) => {
+    setTypeFilter((prev) => {
+      if (checked) {
+        return [...prev, value];
+      } else {
+        return prev.filter((type) => type !== value);
+      }
+    });
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const handleShippingTypeChange = (checked: boolean, value: ShippingType) => {
+    setShippingTypeFilter((prev) => {
+      if (checked) {
+        return [...prev, value];
+      } else {
+        return prev.filter((type) => type !== value);
+      }
+    });
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const handleBlockedParcelChange = (checked: boolean, value: boolean) => {
+    setBlockedParcelFilter(checked ? value : undefined);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
@@ -540,6 +628,138 @@ export default function AdminParcelsTable() {
                       />
                       <Label
                         htmlFor={`status-${i}`}
+                        className="flex grow justify-between gap-2 font-normal"
+                      >
+                        {value}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {/* Filter by parcel type */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <FilterIcon
+                  className="-ms-1 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Parcel Type
+                {typeFilter.length > 0 && (
+                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                    {typeFilter.length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto min-w-36 p-3" align="start">
+              <div className="space-y-3">
+                <div className="text-muted-foreground text-xs font-medium">
+                  Filters
+                </div>
+                <div className="space-y-3">
+                  {Object.values(ParcelType).map((value, i) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`type-${i}`}
+                        checked={typeFilter.includes(value)}
+                        onCheckedChange={(checked: boolean) =>
+                          handleTypeChange(checked, value)
+                        }
+                      />
+                      <Label
+                        htmlFor={`type-${i}`}
+                        className="flex grow justify-between gap-2 font-normal"
+                      >
+                        {value.charAt(0).toUpperCase() + value.slice(1)}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {/* Filter by shipping type */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <FilterIcon
+                  className="-ms-1 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Shipping Type
+                {shippingTypeFilter.length > 0 && (
+                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                    {shippingTypeFilter.length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto min-w-36 p-3" align="start">
+              <div className="space-y-3">
+                <div className="text-muted-foreground text-xs font-medium">
+                  Filters
+                </div>
+                <div className="space-y-3">
+                  {Object.values(ShippingType).map((value, i) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`shippingType-${i}`}
+                        checked={shippingTypeFilter.includes(value)}
+                        onCheckedChange={(checked: boolean) =>
+                          handleShippingTypeChange(checked, value)
+                        }
+                      />
+                      <Label
+                        htmlFor={`shippingType-${i}`}
+                        className="flex grow justify-between gap-2 font-normal"
+                      >
+                        {value.charAt(0).toUpperCase() + value.slice(1)}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {/* Filter by blocked parcels */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <FilterIcon
+                  className="-ms-1 opacity-60"
+                  size={16}
+                  aria-hidden="true"
+                />
+                Blocked
+                {blockedParcelFilter !== undefined && (
+                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                    {blockedParcelFilter ? "Yes" : "No"}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto min-w-36 p-3" align="start">
+              <div className="space-y-3">
+                <div className="text-muted-foreground text-xs font-medium">
+                  Filters
+                </div>
+                <div className="space-y-3">
+                  {["Yes", "No"].map((value, i) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`blocking-${i}`}
+                        checked={blockedParcelFilter === (value === "Yes")}
+                        onCheckedChange={(checked: boolean) =>
+                          handleBlockedParcelChange(checked, value === "Yes")
+                        }
+                      />
+                      <Label
+                        htmlFor={`blocking-${i}`}
                         className="flex grow justify-between gap-2 font-normal"
                       >
                         {value}
@@ -837,7 +1057,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     console.log(data);
     try {
       const res = await updateStatusAndPersonnel({
-        id: row.original._id,
+        id: row.original?._id,
         data,
       }).unwrap();
 
@@ -877,7 +1097,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     const { isBlocked, reason } = data;
     try {
       const res = await blockParcel({
-        id: row.original._id,
+        id: row.original?._id,
         data: { isBlocked: isBlocked === "blocked", reason },
       }).unwrap();
 
@@ -929,7 +1149,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                 <DialogTitle>Change Status</DialogTitle>
                 <DialogDescription>
                   Are you sure you want to change the status of parcel{" "}
-                  {row.original.trackingId}?
+                  {row.original?.trackingId}?
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -987,7 +1207,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                     name="deliveryPersonnelId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Delivery Personnel</FormLabel>
+                        <FormLabel>Assign Delivery Personnel</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Enter delivery personnel ID"

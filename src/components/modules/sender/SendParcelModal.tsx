@@ -205,7 +205,17 @@ export function CreateParcelDialog({
                 <FormItem>
                   <FormLabel>Weight (kg)</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.1" min="0.1" {...field} />
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      {...field}
+                      value={
+                        typeof field.value === "number"
+                          ? field.value
+                          : Number(field.value) || ""
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -218,7 +228,7 @@ export function CreateParcelDialog({
                 <FormItem>
                   <FormLabel>Parcel Type</FormLabel>
                   <FormControl>
-                    <Select {...field}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select parcel type" />
                       </SelectTrigger>
@@ -242,7 +252,7 @@ export function CreateParcelDialog({
                 <FormItem>
                   <FormLabel>Shipping Type</FormLabel>
                   <FormControl>
-                    <Select {...field}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select shipping type" />
                       </SelectTrigger>

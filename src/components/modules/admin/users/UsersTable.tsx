@@ -116,7 +116,7 @@ const columns: ColumnDef<IUser>[] = [
     header: "Name",
     accessorKey: "name",
     cell: ({ row }) => {
-      const name = row.original.name;
+      const name = row.original?.name;
       const initials = getNameInitials(name);
 
       return (
@@ -179,7 +179,7 @@ const columns: ColumnDef<IUser>[] = [
     header: "Is Verified",
     accessorKey: "isVerified",
     cell: ({ row }) => {
-      return <div>{row.original.isVerified ? "Yes" : "No"}</div>;
+      return <div>{row.original?.isVerified ? "Yes" : "No"}</div>;
     },
     size: 100,
     enableHiding: true,
@@ -270,8 +270,6 @@ export default function UsersTable() {
   };
 
   const { data: usersData } = useGetAllUsersQuery({ ...currentQuery });
-
-  console.log({ usersData });
 
   // Search handlers
   const handleSearch = () => {
@@ -446,7 +444,7 @@ export default function UsersTable() {
                         }
                       />
                       <Label
-                        htmlFor={`status-${i}`}
+                        htmlFor={`role-${i}`}
                         className="flex grow justify-between gap-2 font-normal"
                       >
                         {value}
@@ -513,6 +511,11 @@ export default function UsersTable() {
                   aria-hidden="true"
                 />
                 Verified Status
+                {verifiedFilter !== undefined && (
+                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                    {verifiedFilter ? "Yes" : "No"}
+                  </span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto min-w-36 p-3" align="start">
@@ -531,7 +534,7 @@ export default function UsersTable() {
                         }
                       />
                       <Label
-                        htmlFor={`status-${i}`}
+                        htmlFor={`isVerified-${i}`}
                         className="flex grow justify-between gap-2 font-normal"
                       >
                         {value}
@@ -822,7 +825,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     console.log(data);
     try {
       const res = await blockUser({
-        id: row.original._id,
+        id: row.original?._id,
         data,
       }).unwrap();
 
@@ -870,7 +873,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
                 <DialogTitle>Change Active Status</DialogTitle>
                 <DialogDescription>
                   Are you sure you want to change the active status of user{" "}
-                  {row.original.name}?
+                  {row.original?.name}?
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
