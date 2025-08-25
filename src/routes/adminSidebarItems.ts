@@ -17,11 +17,11 @@ export const adminSidebarItems: ISidebarItem[] = [
         url: "/admin/analytics",
         component: Analytics,
       },
-      {
-        title: "User Statistics",
-        url: "/admin/user-statistics",
-        component: Analytics,
-      },
+      // {
+      //   title: "User Statistics",
+      //   url: "/admin/user-statistics",
+      //   component: Analytics,
+      // },
     ],
   },
   {

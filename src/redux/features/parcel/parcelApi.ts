@@ -127,6 +127,13 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["ALL_PARCEL"],
     }),
+    getParcelAnalytics: builder.query({
+      query: () => ({
+        url: "/stats/parcels",
+        method: "GET",
+      }),
+      providesTags: ["ALL_PARCEL"],
+    }),
     // public
     trackParcel: builder.query<IResponse<IParcelTrackData>, string>({
       query: (trackingId) => ({
@@ -153,4 +160,5 @@ export const {
   useUpdateStatusAndPersonnelMutation,
   useBlockParcelMutation,
   useConfirmParcelDeliveryMutation,
+  useGetParcelAnalyticsQuery,
 } = parcelApi;
