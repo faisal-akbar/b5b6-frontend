@@ -32,7 +32,7 @@ export function LoginForm({
       password: "",
     },
   });
-  const [login, { isLoading, isSuccess }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const onSubmit: SubmitHandler<ILogin> = async (data) => {
     try {
       const res = await login(data).unwrap();
