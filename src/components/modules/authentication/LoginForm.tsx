@@ -52,7 +52,7 @@ export function LoginForm({
         }
         return;
       }
-    } catch (err: IError | unknown) {
+    } catch (err: any) {
       if (err?.data?.message === "User does not exist") {
         toast.error("User Not Found");
       }

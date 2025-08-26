@@ -68,7 +68,7 @@ export default function Verify() {
         setTimer(5);
       }
     } catch (err) {
-      toast.error(err?.data?.message, { id: toastId });
+      toast.error((err as any)?.data?.message, { id: toastId });
     }
   };
 
@@ -87,7 +87,7 @@ export default function Verify() {
       }
       navigate("/login");
     } catch (err) {
-      toast.error(err?.data?.message, { id: toastId });
+      toast.error((err as any)?.data?.message, { id: toastId });
     }
   };
 

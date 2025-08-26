@@ -14,7 +14,7 @@ function Analytics() {
   }
 
   if (!isLoading && isError) {
-    return <Error message={error?.message} />;
+    return <Error message={(error as any)?.message} />;
   }
 
   if (!isLoading && !isError && data && !data?.data) {
@@ -32,8 +32,8 @@ function Analytics() {
         </p>
       </div>
 
-      <OverviewCards data={data.data} />
-      <ParcelCharts data={data.data} />
+      <OverviewCards data={data?.data} />
+      <ParcelCharts data={data?.data} />
     </div>
   );
 }

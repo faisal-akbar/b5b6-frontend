@@ -19,7 +19,7 @@ const StatusDetails = () => {
   }
 
   if (!isLoading && isError) {
-    return <Error message={error?.message} />;
+    return <Error message={(error as any)?.message} />;
   }
 
   if (!isLoading && !isError && data && !data?.data) {
@@ -37,7 +37,7 @@ const StatusDetails = () => {
     deliveredAt,
     cancelledAt,
     statusLog,
-  } = data.data || {};
+  } = data?.data || {};
 
   return (
     <section className="py-20 relative">
@@ -132,15 +132,15 @@ const StatusDetails = () => {
                     <div className="pl-6 space-y-1">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-semibold">{sender.name}</span>
+                        <span className="font-semibold">{sender?.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span>{sender.email}</span>
+                        <span>{sender?.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span>{sender.phone}</span>
+                        <span>{sender?.phone}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <MapPin className="w-4 h-4 text-muted-foreground" />
@@ -158,15 +158,15 @@ const StatusDetails = () => {
                     <div className="pl-6 space-y-1">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-semibold">{receiver.name}</span>
+                        <span className="font-semibold">{receiver?.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span>{receiver.email}</span>
+                        <span>{receiver?.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span>{receiver.phone}</span>
+                        <span>{receiver?.phone}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <Home className="w-4 h-4 text-muted-foreground" />
@@ -178,7 +178,9 @@ const StatusDetails = () => {
               </CardContent>
             </Card>
           </div>
-          <StatusTimeLine statusLog={statusLog} />
+          {statusLog && statusLog.length > 0 && (
+            <StatusTimeLine statusLog={statusLog} />
+          )}
         </div>
       </div>
     </section>

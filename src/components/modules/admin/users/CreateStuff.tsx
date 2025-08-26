@@ -79,7 +79,7 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
       } catch (error) {
         console.error("Failed to create delivery personnel:", error);
         toast.error("Failed to create delivery personnel", {
-          description: error?.data?.message || "Please try again.",
+          description: (error as any)?.data?.message || "Please try again.",
         });
       }
     } else {
@@ -91,7 +91,7 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
       } catch (error) {
         console.error("Failed to create admin:", error);
         toast.error("Failed to create admin", {
-          description: error?.data?.message || "Please try again.",
+          description: (error as any)?.data?.message || "Please try again.",
         });
       }
     }

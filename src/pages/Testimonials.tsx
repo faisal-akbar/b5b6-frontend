@@ -1,5 +1,6 @@
+import TestimonialsCTA from "@/components/modules/testimonials/TestimonialsCTA";
 import TestimonialsSection from "@/components/modules/testimonials/TestimonialsSection";
-import TestimonialsCTA from "@/components/modules/testimonials/testimonialsCTA";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, HeartHandshake, Star, Users } from "lucide-react";

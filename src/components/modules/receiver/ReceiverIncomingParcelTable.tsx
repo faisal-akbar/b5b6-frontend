@@ -337,7 +337,6 @@ export default function ReceiverIncomingParcelTable() {
     data: incomingParcels,
     isLoading: isLoadingIncomingParcels,
     isError: isErrorIncomingParcels,
-    error: errorIncomingParcels,
   } = useGetIncomingParcelsQuery({
     ...currentQuery,
   });
@@ -781,13 +780,11 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   // Confirm Delivery
   const handleConfirmDelivery = async (row: Row<IParcel>) => {
     try {
-      const res = await confirmParcelDelivery(row.original?._id).unwrap();
+      await confirmParcelDelivery(row.original?._id).unwrap();
 
-      if (res?.success) {
-        toast.success(
-          "Parcel confirmed successfully. You can find it in Delivery History."
-        );
-      }
+      toast.success(
+        "Parcel confirmed successfully. You can find it in Delivery History."
+      );
     } catch (error) {
       console.error("Failed to delete parcel", error);
     }
@@ -796,7 +793,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   useEffect(() => {
     if (isConfirmError) {
       toast.error("Failed to confirm parcel", {
-        description: confirmError?.data?.message,
+        description: (confirmError as any)?.data?.message,
       });
     }
   }, [isConfirmError, confirmError]);

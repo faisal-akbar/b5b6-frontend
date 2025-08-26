@@ -555,7 +555,7 @@ export default function AdminParcelsTable() {
   }
 
   if (!isLoadingParcels && isErrorParcels) {
-    return <Error message={errorParcels?.data?.message} />;
+    return <Error />;
   }
 
   if (
@@ -1082,15 +1082,16 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     data: z.infer<typeof updateStatusPersonnelSchema>
   ) => {
     try {
-      const res = await updateStatusAndPersonnel({
+      await updateStatusAndPersonnel({
         id: row.original?._id,
-        data,
+        data: {
+          ...data,
+          currentStatus: data.currentStatus as ParcelStatus | undefined,
+        },
       }).unwrap();
 
-      if (res?.success) {
-        setOpen(false);
-        toast.success("Parcel status updated successfully");
-      }
+      setOpen(false);
+      toast.success("Parcel status updated successfully");
     } catch (error) {
       console.error("Failed to update parcel status", error);
     }
@@ -1099,7 +1100,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   useEffect(() => {
     if (isError) {
       toast.error("Failed to cancel parcel", {
-        description: error?.data?.message,
+        description: (error as any)?.data?.message,
       });
     }
   }, [isError, error]);
@@ -1122,19 +1123,17 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   ) => {
     const { isBlocked, reason } = data;
     try {
-      const res = await blockParcel({
+      await blockParcel({
         id: row.original?._id,
         data: { isBlocked: isBlocked === "blocked", reason },
       }).unwrap();
 
-      if (res.success) {
-        setOpenBlock(false);
-        toast.success(
-          `Parcel ${
-            isBlocked === "blocked" ? "blocked" : "unblocked"
-          } successfully`
-        );
-      }
+      setOpenBlock(false);
+      toast.success(
+        `Parcel ${
+          isBlocked === "blocked" ? "blocked" : "unblocked"
+        } successfully`
+      );
     } catch (error) {
       console.error("Failed to update parcel status", error);
     }
@@ -1143,7 +1142,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   useEffect(() => {
     if (isBlockingError) {
       toast.error("Failed to update parcel status", {
-        description: blockingError?.data?.message,
+        description: (blockingError as any)?.data?.message,
       });
     }
   }, [isBlockingError, blockingError]);

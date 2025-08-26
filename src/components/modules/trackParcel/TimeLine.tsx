@@ -77,7 +77,8 @@ const TimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                   )}
                   {item?.updatedBy && (
                     <p className="text-sm text-muted-foreground mb-1">
-                      Updated by: {item.updatedBy?.name}, {item.updatedBy?.role}
+                      Updated by: {item?.updatedBy?.name},{" "}
+                      {item?.updatedBy?.role}
                     </p>
                   )}
                   <p className="text-sm">{item?.note}</p>

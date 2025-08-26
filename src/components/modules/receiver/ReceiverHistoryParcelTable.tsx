@@ -313,7 +313,6 @@ export default function ReceiverHistoryParcelTable() {
     data: historyParcels,
     isLoading: isLoadingHistoryParcels,
     isError: isErrorHistoryParcels,
-    error: errorHistoryParcels,
   } = useGetReceiverParcelHistoryQuery({
     ...currentQuery,
   });

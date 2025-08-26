@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IStatusLog } from "@/types";
+import { StatusLog } from "@/types/sender-parcel-type";
 import { format } from "date-fns";
 import {
   CheckCircle,
@@ -39,7 +39,7 @@ const getStatusIcon = (status: string) => {
       return <Package className="w-5 h-5 text-gray-500" />;
   }
 };
-const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
+const StatusTimeLine = ({ statusLog }: { statusLog: StatusLog[] }) => {
   return (
     <div className="lg:col-span-2">
       <Card className="p-6 shadow-lg border-0 bg-gradient-to-br from-card to-card/50">
@@ -79,7 +79,8 @@ const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                   )}
                   {item?.updatedBy && (
                     <p className="text-sm text-muted-foreground mb-1">
-                      Updated by: {item.updatedBy?.name}, {item.updatedBy?.role}
+                      Updated by: {item?.updatedBy?.name},{" "}
+                      {item?.updatedBy?.role}
                     </p>
                   )}
                   <p className="text-sm">{item?.note}</p>

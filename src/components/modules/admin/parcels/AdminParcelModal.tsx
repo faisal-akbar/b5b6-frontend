@@ -105,8 +105,7 @@ export function AdminCreateParcelDialog({
     } catch (error) {
       console.error("Failed to create parcel:", error);
       toast.error("Failed to create parcel", {
-        description:
-          error instanceof Error ? error.message : "Please try again.",
+        description: (error as any)?.data?.message || "Please try again.",
       });
     }
   };

@@ -860,15 +860,13 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   // Cancel Parcel
   const handleCancel = async (data: z.infer<typeof cancelNoteSchema>) => {
     try {
-      const res = await cancelParcel({
+      await cancelParcel({
         id: row.original?._id,
         note: data.note,
       }).unwrap();
 
-      if (res?.success as boolean) {
-        setOpen(false);
-        toast.success("Parcel canceled successfully");
-      }
+      setOpen(false);
+      toast.success("Parcel canceled successfully");
     } catch (error) {
       console.error("Failed to cancel parcel", error);
     }
@@ -877,7 +875,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   useEffect(() => {
     if (isError) {
       toast.error("Failed to cancel parcel", {
-        description: error?.data?.message,
+        description: (error as any)?.data?.message,
       });
     }
   }, [isError, error]);
@@ -885,11 +883,8 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   // Delete Parcel
   const handleDelete = async (row: Row<IParcel>) => {
     try {
-      const res = await deleteParcel(row.original?._id).unwrap();
-
-      if (res?.success) {
-        toast.success("Parcel deleted successfully");
-      }
+      await deleteParcel(row.original?._id).unwrap();
+      toast.success("Parcel deleted successfully");
     } catch (error) {
       console.error("Failed to delete parcel", error);
     }
@@ -898,7 +893,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   useEffect(() => {
     if (isDeleteError) {
       toast.error("Failed to delete parcel", {
-        description: deleteError?.data?.message,
+        description: (deleteError as any)?.data?.message,
       });
     }
   }, [isDeleteError, deleteError]);

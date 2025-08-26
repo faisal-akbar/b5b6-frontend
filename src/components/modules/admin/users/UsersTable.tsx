@@ -276,7 +276,6 @@ export default function UsersTable() {
     data: usersData,
     isLoading: isLoadingUsers,
     isError: isErrorUsers,
-    error: usersError,
   } = useGetAllUsersQuery({ ...currentQuery });
 
   // Search handlers
@@ -866,7 +865,7 @@ function RowActions({ row }: { row: Row<IUser> }) {
   useEffect(() => {
     if (isError) {
       toast.error("Failed to change status", {
-        description: error?.data?.message,
+        description: (error as any)?.data?.message,
       });
     }
   }, [isError, error]);
