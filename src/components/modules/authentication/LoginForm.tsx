@@ -15,7 +15,7 @@ import {
   RECEIVER_DEFAULT_ROUTE,
   SENDER_DEFAULT_ROUTE,
 } from "@/routes/constants";
-import { IError, ILogin } from "@/types";
+import { ILogin } from "@/types";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";

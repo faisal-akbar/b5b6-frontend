@@ -65,10 +65,9 @@ export function CreateStuffDialog({ open, onOpenChange }: CreateDialogProps) {
     },
   });
 
-  const [createDeliveryPersonnel, { isLoading: isDeliveryPersonnelLoading }] =
-    useCreateDeliveryPersonnelMutation();
+  const [createDeliveryPersonnel] = useCreateDeliveryPersonnelMutation();
 
-  const [createAdmin, { isLoading: isAdminLoading }] = useCreateAdminMutation();
+  const [createAdmin] = useCreateAdminMutation();
 
   const onSubmit = async (values: FormValues) => {
     if (values.role === Role.DELIVERY_PERSONNEL) {

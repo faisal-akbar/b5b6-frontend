@@ -276,7 +276,7 @@ export function CreateParcelDialog({
                 <FormItem>
                   <FormLabel>Coupon Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="" {...field} />
+                    <Input placeholder="IK5QY5NL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

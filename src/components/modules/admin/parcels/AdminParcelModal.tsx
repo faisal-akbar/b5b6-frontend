@@ -38,14 +38,14 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { useAdminCreateParcelMutation } from "@/redux/features/parcel/parcelApi";
-import { ParcelType, ShippingType } from "@/types/sender-parcel-type";
+import { IParcel, ParcelType, ShippingType } from "@/types/sender-parcel-type";
 import { InfoIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
   type: z.enum(Object.values(ParcelType) as [string]).optional(),
   shippingType: z.enum(Object.values(ShippingType) as [string]).optional(),
-  weight: z.coerce
+  weight: z
     .number({ error: "Weight must be a number" })
     .min(0.1, { message: "Weight must be at least 0.1 kg" })
     .max(10, { message: "Weight cannot exceed 10 kg" }),
@@ -71,17 +71,6 @@ const formSchema = z.object({
     .optional(),
 });
 
-type FormValues = {
-  type?: string;
-  shippingType?: string;
-  weight: unknown;
-  couponCode?: string;
-  senderEmail: string;
-  receiverEmail: string;
-  pickupAddress?: string;
-  deliveryAddress?: string;
-};
-
 interface CreateParcelDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -91,7 +80,7 @@ export function AdminCreateParcelDialog({
   open,
   onOpenChange,
 }: CreateParcelDialogProps) {
-  const form = useForm<FormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       senderEmail: "",
@@ -107,16 +96,17 @@ export function AdminCreateParcelDialog({
 
   const [createParcel, { isLoading }] = useAdminCreateParcelMutation();
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await createParcel(values).unwrap();
+      await createParcel(values as Partial<IParcel>).unwrap();
       form.reset();
       onOpenChange(false); // close after success
       toast.success("Parcel created successfully");
     } catch (error) {
       console.error("Failed to create parcel:", error);
       toast.error("Failed to create parcel", {
-        description: error?.data?.message || "Please try again.",
+        description:
+          error instanceof Error ? error.message : "Please try again.",
       });
     }
   };
@@ -299,7 +289,7 @@ export function AdminCreateParcelDialog({
                 <FormItem>
                   <FormLabel>Coupon Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="" {...field} />
+                    <Input placeholder="IK5QY5NL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

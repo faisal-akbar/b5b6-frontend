@@ -12,6 +12,13 @@ export interface IStatusLog {
   status: string;
   location: string;
   note: string;
-  updatedBy?: string;
+  updatedBy?: IUpdatedBy[];
   updatedAt: string;
+}
+
+export interface IUpdatedBy {
+  _id?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
 }

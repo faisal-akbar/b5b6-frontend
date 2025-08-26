@@ -412,7 +412,7 @@ export default function ReceiverIncomingParcelTable() {
   }
 
   if (!isLoadingIncomingParcels && isErrorIncomingParcels) {
-    return <Error message={errorIncomingParcels?.message} />;
+    return <Error />;
   }
 
   if (
@@ -783,7 +783,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     try {
       const res = await confirmParcelDelivery(row.original?._id).unwrap();
 
-      if (res.success) {
+      if (res?.success) {
         toast.success(
           "Parcel confirmed successfully. You can find it in Delivery History."
         );

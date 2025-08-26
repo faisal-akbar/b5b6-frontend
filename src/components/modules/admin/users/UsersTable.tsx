@@ -99,7 +99,7 @@ import {
   useBlockUserByIdMutation,
   useGetAllUsersQuery,
 } from "@/redux/features/user/userApi";
-import { IParcel, IUser } from "@/types";
+import { IUser } from "@/types";
 import { IsActive, Role } from "@/types/user-type";
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getUserIsActiveStatusColor } from "@/utils/getStatusColor";
@@ -368,7 +368,7 @@ export default function UsersTable() {
   }
 
   if (!isLoadingUsers && isErrorUsers) {
-    return <Error message={usersError?.message} />;
+    return <Error />;
   }
 
   if (
@@ -837,7 +837,7 @@ export default function UsersTable() {
   );
 }
 
-function RowActions({ row }: { row: Row<IParcel> }) {
+function RowActions({ row }: { row: Row<IUser> }) {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof isActiveSchema>>({
     resolver: zodResolver(isActiveSchema),

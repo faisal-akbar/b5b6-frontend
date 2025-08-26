@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useGetParcelByIdQuery } from "@/redux/features/parcel/parcelApi";
+import { IUpdatedBy } from "@/types/parcel-type";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { format } from "date-fns";
 import {
@@ -28,7 +29,7 @@ const AdminParcelDetails = () => {
   }
 
   if (!isLoading && isError) {
-    return <Error message={error?.message} />;
+    return <Error message={(error as { message: string })?.message} />;
   }
 
   if (!isLoading && !isError && data && !data?.data) {
@@ -48,7 +49,7 @@ const AdminParcelDetails = () => {
     cancelledAt,
     statusLog,
     deliveryPersonnel,
-  } = data.data || {};
+  } = data?.data || {};
 
   return (
     <section className="py-20 relative">
@@ -80,8 +81,8 @@ const AdminParcelDetails = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge className={getStatusColor(currentStatus)}>
-                    {currentStatus}
+                  <Badge className={getStatusColor(currentStatus ?? "")}>
+                    {currentStatus ?? "Unknown"}
                   </Badge>
                 </div>
                 {currentLocation && (
@@ -144,20 +145,20 @@ const AdminParcelDetails = () => {
                       <div className="flex items-center gap-2">
                         <IdCardIcon className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                          {sender._id}
+                          {sender?._id}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-semibold">{sender.name}</span>
+                        <span className="font-semibold">{sender?.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span>{sender.email}</span>
+                        <span>{sender?.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span>{sender.phone}</span>
+                        <span>{sender?.phone}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <MapPin className="w-4 h-4 text-muted-foreground" />
@@ -176,20 +177,20 @@ const AdminParcelDetails = () => {
                       <div className="flex items-center gap-2">
                         <IdCardIcon className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                          {receiver._id}
+                          {receiver?._id}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-semibold">{receiver.name}</span>
+                        <span className="font-semibold">{receiver?.name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span>{receiver.email}</span>
+                        <span>{receiver?.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span>{receiver.phone}</span>
+                        <span>{receiver?.phone}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <Home className="w-4 h-4 text-muted-foreground" />
@@ -208,27 +209,27 @@ const AdminParcelDetails = () => {
                         </span>
                       </div>
                       <div className="space-y-4">
-                        {deliveryPersonnel.map((person) => (
+                        {(deliveryPersonnel as IUpdatedBy[]).map((person) => (
                           <div className="pl-6 space-y-1" key={person._id}>
                             <div className="flex items-center gap-2">
                               <IdCardIcon className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm text-muted-foreground">
-                                {person._id}
+                                {person?._id}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <User className="w-4 h-4 text-muted-foreground" />
                               <span className="font-semibold">
-                                {person.name}
+                                {person?.name}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Mail className="w-4 h-4 text-muted-foreground" />
-                              <span>{person.email}</span>
+                              <span>{person?.email}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Phone className="w-4 h-4 text-muted-foreground" />
-                              <span>{person.phone}</span>
+                              <span>{person?.phone}</span>
                             </div>
                           </div>
                         ))}
@@ -239,7 +240,9 @@ const AdminParcelDetails = () => {
               </CardContent>
             </Card>
           </div>
-          <AdminParcelTimeLine statusLog={statusLog} />
+          {statusLog && statusLog.length > 0 && (
+            <AdminParcelTimeLine statusLog={statusLog} />
+          )}
         </div>
       </div>
     </section>

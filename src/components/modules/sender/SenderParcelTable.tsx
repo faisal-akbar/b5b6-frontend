@@ -374,7 +374,6 @@ export default function SenderParcelTable() {
     data: senderParcels,
     isLoading: isLoadingSenderParcels,
     isError: isErrorSenderParcels,
-    error: errorSenderParcels,
   } = useGetSenderParcelsQuery({
     ...currentQuery,
   });
@@ -449,7 +448,7 @@ export default function SenderParcelTable() {
   }
 
   if (!isLoadingSenderParcels && isErrorSenderParcels) {
-    return <Error message={errorSenderParcels?.message} />;
+    return <Error />;
   }
 
   if (
@@ -458,7 +457,27 @@ export default function SenderParcelTable() {
     senderParcels &&
     senderParcels?.data.length === 0
   ) {
-    return <Information message="No parcel data available" />;
+    return (
+      <>
+        <div className="flex items-center gap-3">
+          {/* Send parcel button */}
+          <Button
+            onClick={() => setOpen(true)}
+            className="ml-auto"
+            variant="outline"
+          >
+            <PlusIcon
+              className="-ms-1 opacity-60"
+              size={16}
+              aria-hidden="true"
+            />
+            Send Parcel
+          </Button>
+          <CreateParcelDialog open={open} onOpenChange={setOpen} />
+        </div>
+        <Information message="No parcel data available" />
+      </>
+    );
   }
 
   return (
@@ -846,7 +865,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
         note: data.note,
       }).unwrap();
 
-      if (res.success) {
+      if (res?.success as boolean) {
         setOpen(false);
         toast.success("Parcel canceled successfully");
       }
@@ -868,7 +887,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     try {
       const res = await deleteParcel(row.original?._id).unwrap();
 
-      if (res.success) {
+      if (res?.success) {
         toast.success("Parcel deleted successfully");
       }
     } catch (error) {

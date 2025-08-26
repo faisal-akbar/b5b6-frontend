@@ -555,7 +555,7 @@ export default function AdminParcelsTable() {
   }
 
   if (!isLoadingParcels && isErrorParcels) {
-    return <Error message={errorParcels?.message} />;
+    return <Error message={errorParcels?.data?.message} />;
   }
 
   if (
@@ -1081,7 +1081,6 @@ function RowActions({ row }: { row: Row<IParcel> }) {
   const handleChangeStatus = async (
     data: z.infer<typeof updateStatusPersonnelSchema>
   ) => {
-    console.log(data);
     try {
       const res = await updateStatusAndPersonnel({
         id: row.original?._id,

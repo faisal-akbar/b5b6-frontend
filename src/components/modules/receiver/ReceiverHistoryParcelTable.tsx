@@ -376,7 +376,7 @@ export default function ReceiverHistoryParcelTable() {
   }
 
   if (!isLoadingHistoryParcels && isErrorHistoryParcels) {
-    return <Error message={errorHistoryParcels?.message} />;
+    return <Error />;
   }
 
   if (
