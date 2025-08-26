@@ -846,7 +846,6 @@ function RowActions({ row }: { row: Row<IUser> }) {
 
   // Block User
   const handleBlock = async (data: z.infer<typeof isActiveSchema>) => {
-    console.log(data);
     try {
       const res = await blockUser({
         id: row.original?._id,

@@ -28,15 +28,14 @@ export function LoginForm({
   const form = useForm({
     //! For development only
     defaultValues: {
-      email: "admin@example.com",
-      password: "admin123",
+      email: "",
+      password: "",
     },
   });
   const [login] = useLoginMutation();
   const onSubmit: SubmitHandler<ILogin> = async (data) => {
     try {
       const res = await login(data).unwrap();
-      console.log(res);
 
       if (res.success) {
         toast.success("Logged in successfully");
@@ -49,8 +48,9 @@ export function LoginForm({
           navigate(SENDER_DEFAULT_ROUTE);
         } else if (res?.data?.user?.role === "RECEIVER") {
           navigate(RECEIVER_DEFAULT_ROUTE);
+        } else {
+          navigate("/");
         }
-        return;
       }
     } catch (err: any) {
       if (err?.data?.message === "User does not exist") {

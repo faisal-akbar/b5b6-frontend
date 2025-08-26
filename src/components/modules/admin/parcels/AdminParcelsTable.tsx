@@ -563,7 +563,27 @@ export default function AdminParcelsTable() {
     parcelsData &&
     parcelsData?.data.length === 0
   ) {
-    return <Information message="No parcel data available" />;
+    return (
+      <>
+        <div className="flex items-center gap-3">
+          {/* Send parcel button */}
+          <Button
+            onClick={() => setOpen(true)}
+            className="ml-auto"
+            variant="outline"
+          >
+            <PlusIcon
+              className="-ms-1 opacity-60"
+              size={16}
+              aria-hidden="true"
+            />
+            Create Parcel
+          </Button>
+          <AdminCreateParcelDialog open={open} onOpenChange={setOpen} />
+        </div>
+        <Information message="No parcel data available" />
+      </>
+    );
   }
 
   return (

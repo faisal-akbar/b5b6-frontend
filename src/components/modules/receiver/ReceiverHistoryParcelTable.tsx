@@ -81,7 +81,6 @@ const columns: ColumnDef<IParcel>[] = [
     cell: ({ row }) => {
       const name = row?.original?.sender?.name;
       const initials = getNameInitials(name);
-      console.log(name);
 
       return (
         <div className="flex items-start gap-3">

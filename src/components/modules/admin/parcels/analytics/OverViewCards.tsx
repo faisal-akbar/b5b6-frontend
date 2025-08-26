@@ -25,7 +25,7 @@ interface OverviewCardsProps {
 function OverviewCards({ data }: OverviewCardsProps) {
   // Extract counts from your API data
   const total = data?.totalParcel;
-  console.log("Total Parcels:", total);
+
   const delivered =
     data?.totalParcelByStatus?.find(
       (item: StatusCount) => item._id === "Delivered"
