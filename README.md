@@ -5,7 +5,7 @@ Built with React, TypeScript, shadcn/ui, RTK Query, and Recharts for analytics.
 
 ---
 
-Live Demo: [Parcel Delivery System](https://b5b6-parcel.vercel.app/).
+Live Demo: [Parcel Delivery System](https://b5a6-frontend.vercel.app/).
 
 ## 🧱 Features
 
