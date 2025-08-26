@@ -5,7 +5,7 @@ Built with React, TypeScript, shadcn/ui, RTK Query, and Recharts for analytics.
 
 ---
 
-Live Demo: [Parcel Delivery System](https://b5b6-frontend.vercel.app/).
+Live Demo: [Parcel Delivery System](https://b5b6-parcel.vercel.app/).
 
 ## 🧱 Features
 
@@ -78,9 +78,26 @@ email: "bob.receiver@parcel.com",
  // ADMIN
 email: "admin@parcel.com",
 password: "Ph@12345678"
+
+// Sample Id's for delivery personnel
+
+"68ad6b75b010e0e1a1c78d20"
+
+"68ad6b74b010e0e1a1c78d1d"
 ```
 
 ---
+
+## 📦 Public Parcel Status
+
+Use this below sample tracking id:
+
+- `TRK-20250826-404197`
+
+## 📦 Sample Coupon
+
+- `IK5QY5NL`
+- `TU56CKCZ`
 
 ## 📁 Folder Structure
 
