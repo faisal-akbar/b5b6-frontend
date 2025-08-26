@@ -10,37 +10,27 @@ const ViewParcels = lazy(() => import("@/pages/admin/parcels/ViewParcels"));
 
 export const adminSidebarItems: ISidebarItem[] = [
   {
-    title: "Analytics",
+    title: "Parcels",
     items: [
       {
         title: "Parcels Statistics",
         url: "/admin/analytics",
         component: Analytics,
       },
-      // {
-      //   title: "User Statistics",
-      //   url: "/admin/user-statistics",
-      //   component: Analytics,
-      // },
+      {
+        title: "Manage Parcels",
+        url: "/admin/parcels",
+        component: ViewParcels,
+      },
     ],
   },
   {
     title: "Users",
     items: [
       {
-        title: "View All Users",
+        title: "Manage Users",
         url: "/admin/all-users",
         component: AllUsers,
-      },
-    ],
-  },
-  {
-    title: "Parcels",
-    items: [
-      {
-        title: "View All Parcels",
-        url: "/admin/parcels",
-        component: ViewParcels,
       },
     ],
   },

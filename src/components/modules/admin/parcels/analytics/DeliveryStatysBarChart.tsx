@@ -10,6 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { getStatusHexColor } from "@/utils/getStatusColor";
 import {
   Bar,
   BarChart,
@@ -19,22 +20,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-export const description = "A mixed bar chart";
-
-const STATUS_COLORS = {
-  Delivered: "#22c55e", // green-500
-  "In-Transit": "#2563eb", // blue-600
-  Dispatched: "#a21caf", // purple-800
-  Picked: "#f59e42", // orange-400
-  Approved: "#eab308", // yellow-500
-  Requested: "#6b7280", // gray-500
-  Rescheduled: "#6366f1", // indigo-500
-  Returned: "#ef4444", // red-500
-  Cancelled: "#ef4444", // red-500
-  Blocked: "#ef4444", // red-500
-  Flagged: "#eab308", // yellow-500
-  default: "#6b7280", // gray-500
-};
 
 const chartConfig = {
   count: {
@@ -42,8 +27,27 @@ const chartConfig = {
     color: "var(--chart-5)",
   },
 };
-export default function DeliveryStatusBarChart({ data }) {
-  const chartData = [
+
+interface ChartDataItem {
+  _id: string;
+  count: number;
+}
+
+interface AnalyticsData {
+  totalParcelByStatus?: Array<{
+    _id: string;
+    count: number;
+  }>;
+}
+
+interface DeliveryStatusBarChartProps {
+  data?: AnalyticsData;
+}
+
+export default function DeliveryStatusBarChart({
+  data,
+}: DeliveryStatusBarChartProps) {
+  const chartData: ChartDataItem[] = [
     {
       _id: "Requested",
       count:
@@ -113,25 +117,41 @@ export default function DeliveryStatusBarChart({ data }) {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Delivery Distribution</CardTitle>
-        <CardDescription>
-          How many Parcel were made in each status?
+    <Card className="hover:shadow-lg transition-shadow duration-200 border-0 shadow-sm">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-xl font-semibold text-foreground">
+          Delivery Status Distribution
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Parcel count by delivery status across all shipments
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <CardContent className="pt-0">
+        <ChartContainer config={chartConfig} className="h-[320px] w-full">
           <BarChart
             accessibilityLayer
             data={chartData}
             layout="vertical"
             margin={{
-              left: -22,
+              left: -10,
+              right: 20,
+              top: 20,
+              bottom: 20,
             }}
           >
-            <CartesianGrid vertical={false} />
-            <XAxis type="number" dataKey="count" hide />
+            <CartesianGrid
+              horizontal={false}
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.3}
+            />
+            <XAxis
+              type="number"
+              dataKey="count"
+              hide
+              axisLine={false}
+              tickLine={false}
+            />
             <YAxis
               dataKey="_id"
               type="category"
@@ -139,23 +159,27 @@ export default function DeliveryStatusBarChart({ data }) {
               tickMargin={16}
               axisLine={false}
               width={120}
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="count" fill="var(--color-count)" radius={5}>
-              {chartData.map((entry, idx) => (
-                <Cell
-                  key={entry._id}
-                  fill={STATUS_COLORS[entry._id] || STATUS_COLORS.default}
-                />
+            <Bar
+              dataKey="count"
+              fill="var(--color-count)"
+              radius={[0, 4, 4, 0]}
+              barSize={20}
+            >
+              {chartData.map((entry) => (
+                <Cell key={entry._id} fill={getStatusHexColor(entry._id)} />
               ))}
               <LabelList
                 position="right"
                 offset={12}
-                className="fill-foreground"
+                className="fill-foreground font-medium"
                 fontSize={12}
+                formatter={(value: number) => value?.toLocaleString()}
               />
             </Bar>
           </BarChart>

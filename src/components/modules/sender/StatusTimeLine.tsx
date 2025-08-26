@@ -62,19 +62,6 @@ const StatusTimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                   <div className=" flex flex-col md:flex-row md:items-center md:justify-between mb-2">
                     <h4 className="font-semibold mb-2 md:mb-0">
                       {item.status}
-                      {/* <div className="absolute -inset-y-2 -end-4 text-muted-foreground/80">
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <InfoIcon size={14} />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              Status updated by {item?.updatedBy?.name},{" "}
-                              {item?.updatedBy?.role}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div> */}
                     </h4>
 
                     <span className="text-sm text-muted-foreground">

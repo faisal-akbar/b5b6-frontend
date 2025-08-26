@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Pie, PieChart } from "recharts";
+import { Cell, Pie, PieChart } from "recharts";
 
 const chartConfig = {
   count: {
@@ -33,51 +33,94 @@ const chartConfig = {
     color: "var(--chart-4)",
   },
 };
-function TypePieChart({ data }) {
-  const chartData = [
+
+// Parcel type colors using consistent color system
+const PARCEL_TYPE_COLORS = {
+  document: "#3b82f6", // blue-500
+  package: "#10b981", // emerald-500
+  fragile: "#f59e0b", // amber-500
+  electronics: "#8b5cf6", // violet-500
+};
+
+interface ChartDataItem {
+  _id: string;
+  count: number;
+  fill: string;
+}
+
+interface AnalyticsData {
+  parcelPerType?: Array<{
+    _id: string;
+    count: number;
+  }>;
+}
+
+interface TypePieChartProps {
+  data?: AnalyticsData;
+}
+
+function TypePieChart({ data }: TypePieChartProps) {
+  const chartData: ChartDataItem[] = [
     {
       _id: "document",
       count:
         data?.parcelPerType?.find((item) => item._id === "document")?.count ||
         0,
-      fill: "var(--color-document)",
+      fill: PARCEL_TYPE_COLORS.document,
     },
     {
       _id: "package",
       count:
         data?.parcelPerType?.find((item) => item._id === "package")?.count || 0,
-      fill: "var(--color-package)",
+      fill: PARCEL_TYPE_COLORS.package,
     },
     {
       _id: "fragile",
       count:
         data?.parcelPerType?.find((item) => item._id === "fragile")?.count || 0,
-      fill: "var(--color-fragile)",
+      fill: PARCEL_TYPE_COLORS.fragile,
     },
     {
       _id: "electronics",
       count:
         data?.parcelPerType?.find((item) => item._id === "electronics")
           ?.count || 0,
-      fill: "var(--color-electronics)",
+      fill: PARCEL_TYPE_COLORS.electronics,
     },
-  ];
+  ].filter((item) => item.count > 0);
+
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Parcel Type</CardTitle>
-        <CardDescription>
-          How many different types of Parcel orders received?
+    <Card className="hover:shadow-lg transition-shadow duration-200 border-0 shadow-sm">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-xl font-semibold text-foreground">
+          Parcel Type Distribution
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Breakdown of parcels by type category
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="pt-0">
         <ChartContainer
           config={chartConfig}
-          className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[250px] pb-0"
+          className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[280px]"
         >
           <PieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="count" label nameKey="_id"></Pie>
+            <Pie
+              data={chartData}
+              dataKey="count"
+              nameKey="_id"
+              label
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              innerRadius={40}
+              paddingAngle={2}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Pie>
           </PieChart>
         </ChartContainer>
       </CardContent>
