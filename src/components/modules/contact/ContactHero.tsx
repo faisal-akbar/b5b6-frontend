@@ -2,27 +2,28 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 
+const contactInfo = [
+  {
+    icon: <Mail className="w-6 h-6" />,
+    title: "Email Us",
+    description: "support@nextlevelparcel.com",
+    subtitle: "We'll respond within 24 hours",
+  },
+  {
+    icon: <Phone className="w-6 h-6" />,
+    title: "Call Us",
+    description: "+8801717171717",
+    subtitle: "Available 24/7 for urgent matters",
+  },
+  {
+    icon: <MessageSquare className="w-6 h-6" />,
+    title: "Live Chat",
+    description: "Chat with our support team",
+    subtitle: "Get instant help anytime",
+  },
+];
+
 function ContactHero() {
-  const contactInfo = [
-    {
-      icon: <Mail className="w-6 h-6" />,
-      title: "Email Us",
-      description: "support@nextlevelparcel.com",
-      subtitle: "We'll respond within 24 hours",
-    },
-    {
-      icon: <Phone className="w-6 h-6" />,
-      title: "Call Us",
-      description: "+8801717171717",
-      subtitle: "Available 24/7 for urgent matters",
-    },
-    {
-      icon: <MessageSquare className="w-6 h-6" />,
-      title: "Live Chat",
-      description: "Chat with our support team",
-      subtitle: "Get instant help anytime",
-    },
-  ];
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background"></div>

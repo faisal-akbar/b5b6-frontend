@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { sendEmail } from "@/lib/emailjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, MessageSquare, User } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +20,32 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import ContactHero from "./ContactHero";
+
+interface EmailJSTemplateParams {
+  from_name: string;
+  from_email: string;
+  message: string;
+  source: string;
+  to_name: string;
+}
+
+interface EmailJSResponse {
+  status: number;
+  text: string;
+}
+
+declare global {
+  interface Window {
+    emailjs: {
+      send: (
+        serviceId: string,
+        templateId: string,
+        templateParams: EmailJSTemplateParams,
+        publicKey: string
+      ) => Promise<EmailJSResponse>;
+    };
+  }
+}
 
 const contactSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -44,14 +71,37 @@ export default function ContactForm() {
 
   const [loading, setLoading] = useState(false);
 
-  function onSubmit(values: ContactFormValues) {
+  async function onSubmit(values: ContactFormValues) {
     setLoading(true);
-    // Simulate email sending with a Promise
-    new Promise((resolve) => setTimeout(resolve, 2000)).then(() => {
+
+    try {
+      // template parameters
+      const templateParams: EmailJSTemplateParams = {
+        from_name: values.name,
+        from_email: values.email,
+        message: values.message,
+        source: values.source || "Contact Form",
+        to_name: "Support Team",
+      };
+
+      // Send email
+      const response = await sendEmail(templateParams);
+
+      // Check if email was sent successfully
+      if (response.status === 200) {
+        toast.success("Message sent successfully!", {
+          description: "We'll get back to you as soon as possible.",
+        });
+        form.reset();
+      } else {
+        throw new Error("Failed to send message. Please try again.");
+      }
+    } catch (error: unknown) {
+      console.log("Email sending error:", error);
+      toast.error("Failed to send message. Please try again.", {});
+    } finally {
       setLoading(false);
-      toast.success("Message sent successfully!");
-      form.reset();
-    });
+    }
   }
 
   return (
@@ -90,6 +140,7 @@ export default function ContactForm() {
                               placeholder="Your Name"
                               {...field}
                               className="h-12"
+                              disabled={loading}
                             />
                           </FormControl>
                           <FormMessage />
@@ -111,6 +162,7 @@ export default function ContactForm() {
                               placeholder="you@example.com"
                               {...field}
                               className="h-12"
+                              disabled={loading}
                             />
                           </FormControl>
                           <FormMessage />
@@ -134,6 +186,7 @@ export default function ContactForm() {
                             placeholder="Tell us how we can help you..."
                             {...field}
                             className="resize-none"
+                            disabled={loading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -152,6 +205,7 @@ export default function ContactForm() {
                             placeholder="e.g. Searching the web, Social media, Friend recommendation"
                             {...field}
                             className="h-12"
+                            disabled={loading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -168,7 +222,7 @@ export default function ContactForm() {
                       <Spinner className="mt-1" variant={"circle-filled"} />
                     )}
                     {loading ? (
-                      <span>Sending...</span>
+                      <span>Sending Message...</span>
                     ) : (
                       <span>Send Message</span>
                     )}
