@@ -135,7 +135,7 @@ const columns: ColumnDef<IUser>[] = [
     },
     size: 210,
     enableHiding: true,
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     header: "Email",
