@@ -1124,6 +1124,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     try {
       await blockParcel({
         id: row.original?._id,
+        // @ts-ignore
         data: { isBlocked: isBlocked === "blocked", reason },
       }).unwrap();
 

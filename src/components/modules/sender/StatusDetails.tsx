@@ -69,7 +69,7 @@ const StatusDetails = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge className={getStatusColor(currentStatus)}>
+                  <Badge className={getStatusColor(currentStatus ?? "Unknown")}>
                     {currentStatus}
                   </Badge>
                 </div>

@@ -12,7 +12,7 @@ export interface IStatusLog {
   status: string;
   location: string;
   note: string;
-  updatedBy?: IUpdatedBy[];
+  updatedBy?: IUpdatedBy;
   updatedAt: string;
 }
 
