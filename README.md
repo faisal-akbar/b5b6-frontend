@@ -1,69 +1,307 @@
-# React + TypeScript + Vite
+# 📦 Parcel Delivery System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, modular, and secure web application for managing parcel deliveries.
+Built with React, TypeScript, shadcn/ui, RTK Query, and Recharts for analytics.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Live Demo: [Parcel Delivery System](https://b5b6-frontend.vercel.app/).
 
-## Expanding the ESLint configuration
+## 🧱 Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Authentication: Email/password login, JWT, OTP verification
+- Role-based Access to dashboard: Sender, Receiver, Admin, Super Admin, Delivery Personnel
+- Manage users, parcels, and deliveries
+- Parcel Lifecycle: Request, Approve, Picked, Dispatch, In Transit, Deliver, Block, Cancel, Flagged
+- Real-time Tracking: Track parcels by tracking ID
+- Status Analytics: Bar and Pie charts for delivery status, parcel type, shipping type, and trends
+- Responsive UI: Modern design with shadcn/ui and Tailwind CSS
+- Coupon Support: Admins can create and manage coupons
+- Notifications: Email for OTP verification
+- Contact email using Emailjs
+- Global Error Handling: User-friendly error messages
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🧩 Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- React + Vite — Frontend framework
+- TypeScript — Type safety
+- shadcn/ui — Modern UI components
+- Tailwind CSS — Utility-first styling
+- RTK Query — Data fetching and caching
+- Recharts — Analytics and charts
+- Sonner — Toast notifications
+- React Hook Form + Zod — Forms and validation
+- Lucide Icons — Icon set
+- Emailjs for email receiving
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🛠️ Getting Started
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/faisal-akbar/b5b6-frontend.git
+cd b5b6-frontend
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment
+cp .env.example .env
+
+# 4. Update .env with your MongoDB URI, nodemailer credentials, redis credentials, etc.
+VITE_BASE_URL=http://localhost:5000/api/v1
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=template_id
+VITE_EMAILJS_PUBLIC_ID=your_public_id
+
+# 5. Run locally
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Email and password for testing dummy users:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+// SUPER_ADMIN
+email: "super@gmail.com",
+password: "12345678"
+
+// ADMIN
+email: "admin@parcel.com",
+password: "admin123"
+
+// SENDER
+email: "john.sender@parcel.com",
+password: "sender123"
+
+// RECEIVER
+email: "bob.receiver@parcel.com",
+ password: "receiver123",
+```
+
+---
+
+## 📁 Folder Structure
+
+```
+.
+├── README.md
+├── components.json
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── public
+│   └── vite.svg
+├── src
+│   ├── App.tsx
+│   ├── assets
+│   │   ├── icons
+│   │   │   └── Logo.tsx
+│   │   ├── images
+│   │   │   ├── parcel-login.jpg
+│   │   │   └── parcel-register.jpg
+│   │   └── react.svg
+│   ├── components
+│   │   ├── DeleteConformation.tsx
+│   │   ├── Error.tsx
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── Information.tsx
+│   │   ├── Loading.tsx
+│   │   ├── NotFound.tsx
+│   │   ├── app-sidebar.tsx
+│   │   ├── layout
+│   │   │   ├── CommonLayout.tsx
+│   │   │   ├── DashboardLayout.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── ModeToggle.tsx
+│   │   │   └── Navbar.tsx
+│   │   ├── modules
+│   │   │   ├── about
+│   │   │   │   ├── AboutFeatures.tsx
+│   │   │   │   ├── AboutHero.tsx
+│   │   │   │   └── AboutJourney.tsx
+│   │   │   ├── admin
+│   │   │   │   ├── parcels
+│   │   │   │   │   ├── AdminParcelDetails.tsx
+│   │   │   │   │   ├── AdminParcelModal.tsx
+│   │   │   │   │   ├── AdminParcelTimeLine.tsx
+│   │   │   │   │   ├── AdminParcelsTable.tsx
+│   │   │   │   │   └── analytics
+│   │   │   │   │       ├── DeliveryStatysBarChart.tsx
+│   │   │   │   │       ├── OverViewCards.tsx
+│   │   │   │   │       ├── ParcelsCharts.tsx
+│   │   │   │   │       ├── ShipmentBarChart.tsx
+│   │   │   │   │       ├── ShippingTypeChart.tsx
+│   │   │   │   │       └── TypePieChart.tsx
+│   │   │   │   └── users
+│   │   │   │       ├── CreateStuff.tsx
+│   │   │   │       └── UsersTable.tsx
+│   │   │   ├── authentication
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   └── RegisterForm.tsx
+│   │   │   ├── contact
+│   │   │   │   ├── ContactHero.tsx
+│   │   │   │   └── contactForm.tsx
+│   │   │   ├── faq
+│   │   │   │   ├── FaqContact.tsx
+│   │   │   │   ├── FaqHero.tsx
+│   │   │   │   └── FaqSection.tsx
+│   │   │   ├── features
+│   │   │   │   ├── FeaturesBenefit.tsx
+│   │   │   │   ├── FeaturesCTA.tsx
+│   │   │   │   ├── FeaturesGrid.tsx
+│   │   │   │   └── FeaturesHero.tsx
+│   │   │   ├── home
+│   │   │   │   ├── Feature.tsx
+│   │   │   │   ├── Hero.tsx
+│   │   │   │   ├── HomeAbout.tsx
+│   │   │   │   ├── HomeCTA.tsx
+│   │   │   │   ├── HomeFaq.tsx
+│   │   │   │   └── HomeTestimonials.tsx
+│   │   │   ├── receiver
+│   │   │   │   ├── ReceiverHistoryParcelTable.tsx
+│   │   │   │   └── ReceiverIncomingParcelTable.tsx
+│   │   │   ├── sender
+│   │   │   │   ├── SendParcelModal.tsx
+│   │   │   │   ├── SenderParcelTable.tsx
+│   │   │   │   ├── StatusDetails.tsx
+│   │   │   │   └── StatusTimeLine.tsx
+│   │   │   ├── testimonials
+│   │   │   │   ├── TestimonialsCTA.tsx
+│   │   │   │   └── TestimonialsSection.tsx
+│   │   │   └── trackParcel
+│   │   │       ├── HelpSection.tsx
+│   │   │       ├── ParcelDetails.tsx
+│   │   │       ├── TimeLine.tsx
+│   │   │       ├── Track.tsx
+│   │   │       ├── TrackParcelForm.tsx
+│   │   │       └── TrackParcelHero.tsx
+│   │   └── ui
+│   │       ├── Password.tsx
+│   │       ├── accordion.tsx
+│   │       ├── alert-dialog.tsx
+│   │       ├── avatar.tsx
+│   │       ├── badge.tsx
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── chart.tsx
+│   │       ├── checkbox.tsx
+│   │       ├── dialog.tsx
+│   │       ├── dropdown-menu.tsx
+│   │       ├── form.tsx
+│   │       ├── input-otp.tsx
+│   │       ├── input.tsx
+│   │       ├── label.tsx
+│   │       ├── nav-user.tsx
+│   │       ├── navigation-menu.tsx
+│   │       ├── pagination.tsx
+│   │       ├── popover.tsx
+│   │       ├── select.tsx
+│   │       ├── separator.tsx
+│   │       ├── shadcn-io
+│   │       │   └── spinner
+│   │       │       └── index.tsx
+│   │       ├── sheet.tsx
+│   │       ├── sidebar.tsx
+│   │       ├── skeleton.tsx
+│   │       ├── sonner.tsx
+│   │       ├── table.tsx
+│   │       ├── textarea.tsx
+│   │       └── tooltip.tsx
+│   ├── config
+│   │   └── index.ts
+│   ├── context
+│   │   └── theme-context.ts
+│   ├── hooks
+│   │   ├── use-mobile.ts
+│   │   └── useTheme.ts
+│   ├── index.css
+│   ├── lib
+│   │   ├── axios.ts
+│   │   ├── emailjs.ts
+│   │   └── utils.ts
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── About.tsx
+│   │   ├── Contact.tsx
+│   │   ├── FAQ.tsx
+│   │   ├── Features.tsx
+│   │   ├── HomePage.tsx
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx
+│   │   ├── Testimonials.tsx
+│   │   ├── TrackParcel.tsx
+│   │   ├── Unauthorized.tsx
+│   │   ├── Verify.tsx
+│   │   ├── admin
+│   │   │   ├── analytics
+│   │   │   │   └── Analytics.tsx
+│   │   │   ├── parcels
+│   │   │   │   ├── ViewParcelDetails.tsx
+│   │   │   │   └── ViewParcels.tsx
+│   │   │   └── user
+│   │   │       └── AllUsers.tsx
+│   │   ├── receiver
+│   │   │   ├── DeliveryHistory.tsx
+│   │   │   └── IncomingParcels.tsx
+│   │   └── sender
+│   │       ├── MyParcels.tsx
+│   │       └── ParcelStatus.tsx
+│   ├── providers
+│   │   └── theme-provider.tsx
+│   ├── redux
+│   │   ├── api
+│   │   │   ├── axiosBaseQuery.ts
+│   │   │   └── baseApi.ts
+│   │   ├── features
+│   │   │   ├── auth
+│   │   │   │   └── authApi.ts
+│   │   │   ├── coupon
+│   │   │   │   └── couponApi.ts
+│   │   │   ├── parcel
+│   │   │   │   └── parcelApi.ts
+│   │   │   └── user
+│   │   │       └── userApi.ts
+│   │   ├── hooks.ts
+│   │   └── store.ts
+│   ├── routes
+│   │   ├── adminSidebarItems.ts
+│   │   ├── constants.ts
+│   │   ├── index.tsx
+│   │   ├── receiverSidebarItems.ts
+│   │   └── senderSidebarItems.ts
+│   ├── types
+│   │   ├── auth-type.ts
+│   │   ├── index.ts
+│   │   ├── parcel-type.ts
+│   │   ├── sender-parcel-type.ts
+│   │   └── user-type.ts
+│   ├── utils
+│   │   ├── generateRoutes.ts
+│   │   ├── getNameInitials.ts
+│   │   ├── getSidebarItems.ts
+│   │   ├── getStatusColor.ts
+│   │   └── withAuth.tsx
+│   └── vite-env.d.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+├── vercel.json
+└── vite.config.ts
+```
+
+---
+
+## 👤 User Roles
+
+| Role                 | Responsibilities                                          |
+| -------------------- | --------------------------------------------------------- |
+| `SENDER`             | send/cancel/delete parcels, view own parcels, status      |
+| `RECEIVER`           | View incoming parcels, confirm delivery, delivery history |
+| `DELIVERY_PERSONNEL` | Currently admin can assign to parcel, and create          |
+| `ADMIN`              | Manage users, create admins and personnel, view analytics |
+| `SUPER_ADMIN`        | Similar to admin                                          |
+
+---
