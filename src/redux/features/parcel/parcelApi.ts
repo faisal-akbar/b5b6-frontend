@@ -118,7 +118,7 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "PATCH",
         data,
       }),
-      invalidatesTags: ["ALL_PARCEL"],
+      invalidatesTags: ["ALL_PARCEL", "SENDER_PARCEL", "RECEIVER_PARCEL"],
     }),
     blockParcel: builder.mutation<
       unknown,
@@ -137,7 +137,7 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "POST",
         data,
       }),
-      invalidatesTags: ["ALL_PARCEL"],
+      invalidatesTags: ["ALL_PARCEL", "SENDER_PARCEL", "RECEIVER_PARCEL"],
     }),
     getParcelAnalytics: builder.query<IResponse<IAnalyticsData>, void>({
       query: () => ({
