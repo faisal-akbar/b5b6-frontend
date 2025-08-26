@@ -23,7 +23,6 @@ import {
   FilterIcon,
   InfoIcon,
   Package,
-  Scale,
   SearchIcon,
   Truck,
   XIcon,
@@ -191,7 +190,7 @@ const columns: ColumnDef<IParcel>[] = [
 
   {
     header: "Parcel Info",
-    accessorKey: "weight",
+    accessorKey: "packageType",
     cell: ({ row }) => {
       const packageType = `${row.original?.type
         .charAt(0)
@@ -201,10 +200,6 @@ const columns: ColumnDef<IParcel>[] = [
         .toUpperCase()}${row.original?.shippingType.slice(1)}`;
       return (
         <div className="space-y-1">
-          <div className="font-medium flex items-center gap-2">
-            <Scale className="h-4 w-4" />
-            {row.original?.weight} {row.original?.weightUnit}
-          </div>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <Package className="h-4 w-4" />
             {packageType}
@@ -213,27 +208,6 @@ const columns: ColumnDef<IParcel>[] = [
             <Truck className="h-4 w-4" />
             {shippingType}
           </div>
-        </div>
-      );
-    },
-    size: 130,
-    enableHiding: true,
-    enableSorting: true,
-  },
-  {
-    header: "Cost",
-    accessorKey: "fee",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("fee"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "BDT",
-        minimumFractionDigits: 0,
-      }).format(amount);
-      return (
-        <div className="space-y-1">
-          <div>{formatted.slice(4)}</div>
-          <div className="text-sm text-muted-foreground">BDT</div>
         </div>
       );
     },
@@ -310,9 +284,9 @@ export default function ReceiverIncomingParcelTable() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     receiver: false,
-    currentLocation: false,
     createdAt: false,
     cancelledAt: false,
+    isPaid: false,
   });
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
