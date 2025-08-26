@@ -322,3 +322,31 @@ Use this below sample tracking id:
 | `SUPER_ADMIN`        | Similar to admin                                          |
 
 ---
+
+## Screenshots
+
+### Admin Dashboard
+
+![Parcel Analytics](docsImages/Parcel_Analytics.png)
+
+![Parcel Management](docsImages/Parcel_manage.png)
+
+![Parcel Details](docsImages/admin_parcel_details.png)
+
+![User Management](docsImages/user_management.png)
+
+---
+
+### Sender Dashboard
+
+![My Parcels](docsImages/sender-parcels.png)
+
+![Parcel Status](docsImages/sender_status_log.png)
+
+---
+
+### Receiver Dashboard
+
+![Incoming Parcels](docsImages/receiver_incoming.png)
+
+![Delivery History](docsImages/receiver_history.png)
