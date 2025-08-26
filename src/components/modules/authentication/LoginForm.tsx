@@ -32,33 +32,46 @@ export function LoginForm({
       password: "",
     },
   });
-  const [login] = useLoginMutation();
+  const [login, { isLoading, isSuccess }] = useLoginMutation();
   const onSubmit: SubmitHandler<ILogin> = async (data) => {
     try {
       const res = await login(data).unwrap();
 
       const role = res?.data?.user?.role?.toUpperCase();
+      // console.log("User role:", role);
       if (role === "ADMIN" || role === "SUPER_ADMIN") {
-        navigate(ADMIN_DEFAULT_ROUTE);
+        // console.log("User is an admin");
+        toast.success("Logged in successfully");
+        navigate(ADMIN_DEFAULT_ROUTE, { replace: true });
+        return;
       } else if (role === "SENDER") {
-        navigate(SENDER_DEFAULT_ROUTE);
+        // console.log("User is a sender");
+        toast.success("Logged in successfully");
+        navigate(SENDER_DEFAULT_ROUTE, { replace: true });
+        return;
       } else if (role === "RECEIVER") {
-        navigate(RECEIVER_DEFAULT_ROUTE);
+        // console.log("User is a receiver");
+        toast.success("Logged in successfully");
+        navigate(RECEIVER_DEFAULT_ROUTE, { replace: true });
+        // console.log("Navigated to receiver dashboard");
+        return;
       } else {
-        navigate("/");
+        toast.success("Logged in successfully");
+        navigate("/", { replace: true });
+        return;
       }
+    } catch (err: unknown) {
+      const error = err as { data?: { message?: string } };
 
-      toast.success("Logged in successfully");
-    } catch (err: any) {
-      if (err?.data?.message === "User does not exist") {
+      if (error?.data?.message === "User does not exist") {
         toast.error("User Not Found");
       }
 
-      if (err?.data.message === "Password does not match") {
+      if (error?.data?.message === "Password does not match") {
         toast.error("Invalid Credentials");
       }
 
-      if (err?.data.message === "User is not verified") {
+      if (error?.data?.message === "User is not verified") {
         toast.error("Your account is not verified");
         navigate("/verify", { state: { email: data.email } });
       }
@@ -113,8 +126,8 @@ export function LoginForm({
               )}
             />
 
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>

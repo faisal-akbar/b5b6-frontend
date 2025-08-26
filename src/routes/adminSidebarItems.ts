@@ -14,12 +14,12 @@ export const adminSidebarItems: ISidebarItem[] = [
     items: [
       {
         title: "Parcels Statistics",
-        url: "/admin/analytics",
+        url: "analytics",
         component: Analytics,
       },
       {
         title: "Manage Parcels",
-        url: "/admin/parcels",
+        url: "parcels",
         component: ViewParcels,
       },
     ],
@@ -29,7 +29,7 @@ export const adminSidebarItems: ISidebarItem[] = [
     items: [
       {
         title: "Manage Users",
-        url: "/admin/all-users",
+        url: "all-users",
         component: AllUsers,
       },
     ],

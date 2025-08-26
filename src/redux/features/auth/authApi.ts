@@ -10,6 +10,8 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         data,
       }),
+      // Invalidate user cache after successful login
+      invalidatesTags: ["USER"],
     }),
     logout: builder.mutation<IResponse<void>, void>({
       query: () => ({
