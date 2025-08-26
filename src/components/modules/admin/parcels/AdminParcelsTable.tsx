@@ -453,7 +453,6 @@ export default function AdminParcelsTable() {
     data: parcelsData,
     isLoading: isLoadingParcels,
     isError: isErrorParcels,
-    error: errorParcels,
   } = useGetAllParcelsQuery({
     ...currentQuery,
   });
