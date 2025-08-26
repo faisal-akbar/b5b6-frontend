@@ -16,17 +16,19 @@ import { useGetMeQuery } from "@/redux/features/user/userApi";
 import { getSidebarItems } from "@/utils/getSidebarItems";
 import * as React from "react";
 import { Link } from "react-router";
+import Error from "./Error";
+import Loading from "./Loading";
 import { NavUser } from "./ui/nav-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: userData, isLoading, isError } = useGetMeQuery(undefined);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (isError) {
-    return <div>Error loading user data</div>;
+    return <Error />;
   }
 
   const data = {
