@@ -37,21 +37,18 @@ export function LoginForm({
     try {
       const res = await login(data).unwrap();
 
-      if (res.success) {
-        toast.success("Logged in successfully");
-        if (
-          res?.data?.user?.role === "ADMIN" ||
-          res?.data?.user?.role === "SUPER_ADMIN"
-        ) {
-          navigate(ADMIN_DEFAULT_ROUTE);
-        } else if (res?.data?.user?.role === "SENDER") {
-          navigate(SENDER_DEFAULT_ROUTE);
-        } else if (res?.data?.user?.role === "RECEIVER") {
-          navigate(RECEIVER_DEFAULT_ROUTE);
-        } else {
-          navigate("/");
-        }
+      const role = res?.data?.user?.role?.toUpperCase();
+      if (role === "ADMIN" || role === "SUPER_ADMIN") {
+        navigate(ADMIN_DEFAULT_ROUTE);
+      } else if (role === "SENDER") {
+        navigate(SENDER_DEFAULT_ROUTE);
+      } else if (role === "RECEIVER") {
+        navigate(RECEIVER_DEFAULT_ROUTE);
+      } else {
+        navigate("/");
       }
+
+      toast.success("Logged in successfully");
     } catch (err: any) {
       if (err?.data?.message === "User does not exist") {
         toast.error("User Not Found");
