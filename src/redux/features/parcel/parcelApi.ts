@@ -16,7 +16,7 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "POST",
         data,
       }),
-      invalidatesTags: ["SENDER_PARCEL"],
+      invalidatesTags: ["SENDER_PARCEL", "RECEIVER_PARCEL", "ALL_PARCEL"],
     }),
     cancelParcel: builder.mutation<unknown, { id: string; note: string }>({
       query: ({ id, note }) => ({
@@ -24,14 +24,14 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "POST",
         data: { note },
       }),
-      invalidatesTags: ["SENDER_PARCEL"],
+      invalidatesTags: ["SENDER_PARCEL", "RECEIVER_PARCEL", "ALL_PARCEL"],
     }),
     deleteParcel: builder.mutation<unknown, string>({
       query: (id) => ({
         url: `/parcels/delete/${id}`,
         method: "POST",
       }),
-      invalidatesTags: ["SENDER_PARCEL"],
+      invalidatesTags: ["SENDER_PARCEL", "RECEIVER_PARCEL", "ALL_PARCEL"],
     }),
     getParcelStatusLog: builder.query<IResponse<IParcel>, string | undefined>({
       query: (id) => ({
@@ -91,7 +91,7 @@ export const parcelApi = baseApi.injectEndpoints({
         url: `/parcels/confirm/${id}`,
         method: "PATCH",
       }),
-      invalidatesTags: ["RECEIVER_PARCEL"],
+      invalidatesTags: ["RECEIVER_PARCEL", "ALL_PARCEL", "SENDER_PARCEL"],
     }),
     // admin
     getAllParcels: builder.query<IResponse<IParcel[]>, IParcelParams>({
@@ -129,7 +129,7 @@ export const parcelApi = baseApi.injectEndpoints({
         method: "PATCH",
         data,
       }),
-      invalidatesTags: ["ALL_PARCEL"],
+      invalidatesTags: ["ALL_PARCEL", "SENDER_PARCEL", "RECEIVER_PARCEL"],
     }),
     adminCreateParcel: builder.mutation<IResponse<IParcel>, Partial<IParcel>>({
       query: (data) => ({
