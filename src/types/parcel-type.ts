@@ -18,6 +18,7 @@ export interface IStatusLog {
 
 export interface IUpdatedBy {
   _id?: string;
+  role?: string;
   name?: string;
   email?: string;
   phone?: string;
