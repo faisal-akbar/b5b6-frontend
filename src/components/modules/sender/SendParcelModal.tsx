@@ -45,7 +45,7 @@ import { toast } from "sonner";
 const formSchema = z.object({
   type: z.enum(Object.values(ParcelType) as [string]).optional(),
   shippingType: z.enum(Object.values(ShippingType) as [string]).optional(),
-  weight: z
+  weight: z.coerce
     .number({ error: "Weight must be a number" })
     .min(0.1, { message: "Weight must be at least 0.1 kg" })
     .max(10, { message: "Weight cannot exceed 10 kg" }),
@@ -77,7 +77,7 @@ export function CreateParcelDialog({
   onOpenChange,
 }: CreateParcelDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       receiverEmail: "",
       pickupAddress: "",
