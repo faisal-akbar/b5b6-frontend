@@ -27,6 +27,9 @@ import {
 } from "lucide-react";
 import { useId, useState } from "react";
 
+import Error from "@/components/Error";
+import Information from "@/components/Information";
+import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -306,7 +309,12 @@ export default function ReceiverHistoryParcelTable() {
     sort: sorting.length > 0 ? sorting[0].id : "-createdAt",
   };
 
-  const { data: incomingParcels } = useGetReceiverParcelHistoryQuery({
+  const {
+    data: historyParcels,
+    isLoading: isLoadingHistoryParcels,
+    isError: isErrorHistoryParcels,
+    error: errorHistoryParcels,
+  } = useGetReceiverParcelHistoryQuery({
     ...currentQuery,
   });
 
@@ -323,12 +331,12 @@ export default function ReceiverHistoryParcelTable() {
   };
 
   const table = useReactTable({
-    data: incomingParcels?.data || [],
+    data: historyParcels?.data || [],
     columns,
     // Server-side pagination configuration
     manualPagination: true,
-    pageCount: incomingParcels?.meta?.totalPage,
-    rowCount: incomingParcels?.meta?.total,
+    pageCount: historyParcels?.meta?.totalPage,
+    rowCount: historyParcels?.meta?.total,
 
     // Server-side sorting configuration
     manualSorting: true,
@@ -362,6 +370,23 @@ export default function ReceiverHistoryParcelTable() {
       columnVisibility,
     },
   });
+
+  if (isLoadingHistoryParcels) {
+    return <Loading message="Loading parcels data..." />;
+  }
+
+  if (!isLoadingHistoryParcels && isErrorHistoryParcels) {
+    return <Error message={errorHistoryParcels?.message} />;
+  }
+
+  if (
+    !isLoadingHistoryParcels &&
+    !isErrorHistoryParcels &&
+    historyParcels &&
+    historyParcels?.data.length === 0
+  ) {
+    return <Information message="No parcel data available" />;
+  }
 
   return (
     <div className="space-y-4">

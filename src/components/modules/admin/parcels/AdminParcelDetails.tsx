@@ -4,15 +4,24 @@ import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useGetParcelStatusLogQuery } from "@/redux/features/parcel/parcelApi";
+import { useGetParcelByIdQuery } from "@/redux/features/parcel/parcelApi";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { format } from "date-fns";
-import { Home, Mail, MapPin, Package, Phone, User } from "lucide-react";
+import {
+  Home,
+  IdCardIcon,
+  Mail,
+  MapPin,
+  Package,
+  Phone,
+  User,
+} from "lucide-react";
 import { useParams } from "react-router";
-import StatusTimeLine from "./StatusTimeLine";
-const StatusDetails = () => {
+import AdminParcelTimeLine from "./AdminParcelTimeLine";
+
+const AdminParcelDetails = () => {
   const { id } = useParams();
-  const { data, isLoading, isError, error } = useGetParcelStatusLogQuery(id);
+  const { data, isLoading, isError, error } = useGetParcelByIdQuery(id);
 
   if (isLoading) {
     return <Loading message="Loading details..." />;
@@ -25,6 +34,7 @@ const StatusDetails = () => {
   if (!isLoading && !isError && data && !data?.data) {
     return <Information message="No details available for this parcel" />;
   }
+
   const {
     trackingId,
     estimatedDelivery,
@@ -37,6 +47,7 @@ const StatusDetails = () => {
     deliveredAt,
     cancelledAt,
     statusLog,
+    deliveryPersonnel,
   } = data.data || {};
 
   return (
@@ -131,6 +142,12 @@ const StatusDetails = () => {
                     </div>
                     <div className="pl-6 space-y-1">
                       <div className="flex items-center gap-2">
+                        <IdCardIcon className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {sender._id}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
                         <span className="font-semibold">{sender.name}</span>
                       </div>
@@ -157,6 +174,12 @@ const StatusDetails = () => {
                     </div>
                     <div className="pl-6 space-y-1">
                       <div className="flex items-center gap-2">
+                        <IdCardIcon className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {receiver._id}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
                         <span className="font-semibold">{receiver.name}</span>
                       </div>
@@ -174,15 +197,53 @@ const StatusDetails = () => {
                       </div>
                     </div>
                   </div>
+                  <Separator />
+                  {/* Assigned Delivery Personnel */}
+                  {deliveryPersonnel && deliveryPersonnel.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <User className="w-4 h-4 text-primary" />
+                        <span className="font-semibold text-md">
+                          Assigned Delivery Personnel
+                        </span>
+                      </div>
+                      <div className="space-y-4">
+                        {deliveryPersonnel.map((person) => (
+                          <div className="pl-6 space-y-1" key={person._id}>
+                            <div className="flex items-center gap-2">
+                              <IdCardIcon className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">
+                                {person._id}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-semibold">
+                                {person.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Mail className="w-4 h-4 text-muted-foreground" />
+                              <span>{person.email}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Phone className="w-4 h-4 text-muted-foreground" />
+                              <span>{person.phone}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
-          <StatusTimeLine statusLog={statusLog} />
+          <AdminParcelTimeLine statusLog={statusLog} />
         </div>
       </div>
     </section>
   );
 };
 
-export default StatusDetails;
+export default AdminParcelDetails;

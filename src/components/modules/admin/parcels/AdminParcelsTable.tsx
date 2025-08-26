@@ -40,6 +40,9 @@ import {
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import Error from "@/components/Error";
+import Information from "@/components/Information";
+import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -110,7 +113,9 @@ import {
 import { getNameInitials } from "@/utils/getNameInitials";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import { format } from "date-fns";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 import { AdminCreateParcelDialog } from "./AdminParcelModal";
@@ -444,7 +449,12 @@ export default function AdminParcelsTable() {
       blockedParcelFilter !== undefined ? blockedParcelFilter : undefined,
   };
 
-  const { data: senderParcels } = useGetAllParcelsQuery({
+  const {
+    data: parcelsData,
+    isLoading: isLoadingParcels,
+    isError: isErrorParcels,
+    error: errorParcels,
+  } = useGetAllParcelsQuery({
     ...currentQuery,
   });
 
@@ -500,12 +510,12 @@ export default function AdminParcelsTable() {
   };
 
   const table = useReactTable({
-    data: senderParcels?.data || [],
+    data: parcelsData?.data || [],
     columns,
     // Server-side pagination configuration
     manualPagination: true,
-    pageCount: senderParcels?.meta?.totalPage,
-    rowCount: senderParcels?.meta?.total,
+    pageCount: parcelsData?.meta?.totalPage,
+    rowCount: parcelsData?.meta?.total,
 
     // Server-side sorting configuration
     manualSorting: true,
@@ -539,6 +549,23 @@ export default function AdminParcelsTable() {
       columnVisibility,
     },
   });
+
+  if (isLoadingParcels) {
+    return <Loading message="Loading parcels data..." />;
+  }
+
+  if (!isLoadingParcels && isErrorParcels) {
+    return <Error message={errorParcels?.message} />;
+  }
+
+  if (
+    !isLoadingParcels &&
+    !isErrorParcels &&
+    parcelsData &&
+    parcelsData?.data.length === 0
+  ) {
+    return <Information message="No parcel data available" />;
+  }
 
   return (
     <div className="space-y-4">
@@ -1061,7 +1088,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
         data,
       }).unwrap();
 
-      if (res.success) {
+      if (res?.success) {
         setOpen(false);
         toast.success("Parcel status updated successfully");
       }
@@ -1137,6 +1164,14 @@ function RowActions({ row }: { row: Row<IParcel> }) {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Link to={`/admin/${row.original?._id}/details`}>
+              <span>View Details</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

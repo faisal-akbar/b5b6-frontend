@@ -6,7 +6,6 @@ import {
   IParcelTrackData,
   IResponse,
 } from "@/types";
-import { StatusLog } from "@/types/sender-parcel-type";
 
 export const parcelApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -34,7 +33,7 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["SENDER_PARCEL"],
     }),
-    getParcelStatusLog: builder.query<IResponse<StatusLog[]>, string>({
+    getParcelStatusLog: builder.query<IResponse<IParcel>, string | undefined>({
       query: (id) => ({
         url: `/parcels/${id}/status-log`,
         method: "GET",
@@ -103,9 +102,9 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       providesTags: ["ALL_PARCEL"],
     }),
-    getParcelById: builder.query<IResponse<IParcel>, string>({
+    getParcelById: builder.query<IResponse<IParcel>, string | undefined>({
       query: (id) => ({
-        url: `/parcels/${id}`,
+        url: `/parcels/${id}/details`,
         method: "GET",
       }),
       providesTags: ["ALL_PARCEL"],

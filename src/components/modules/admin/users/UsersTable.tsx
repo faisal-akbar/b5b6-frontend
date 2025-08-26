@@ -37,6 +37,9 @@ import {
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import Error from "@/components/Error";
+import Information from "@/components/Information";
+import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -269,7 +272,12 @@ export default function UsersTable() {
     isVerified: verifiedFilter !== undefined ? verifiedFilter : undefined,
   };
 
-  const { data: usersData } = useGetAllUsersQuery({ ...currentQuery });
+  const {
+    data: usersData,
+    isLoading: isLoadingUsers,
+    isError: isErrorUsers,
+    error: usersError,
+  } = useGetAllUsersQuery({ ...currentQuery });
 
   // Search handlers
   const handleSearch = () => {
@@ -354,6 +362,23 @@ export default function UsersTable() {
       columnVisibility,
     },
   });
+
+  if (isLoadingUsers) {
+    return <Loading message="Loading users data..." />;
+  }
+
+  if (!isLoadingUsers && isErrorUsers) {
+    return <Error message={usersError?.message} />;
+  }
+
+  if (
+    !isLoadingUsers &&
+    !isErrorUsers &&
+    usersData &&
+    usersData?.data.length === 0
+  ) {
+    return <Information message="No user data available" />;
+  }
 
   return (
     <div className="space-y-4">

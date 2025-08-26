@@ -41,6 +41,9 @@ import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import DeleteConfirmation from "@/components/DeleteConformation";
+import Error from "@/components/Error";
+import Information from "@/components/Information";
+import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -367,7 +370,12 @@ export default function SenderParcelTable() {
     currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
   };
 
-  const { data: senderParcels } = useGetSenderParcelsQuery({
+  const {
+    data: senderParcels,
+    isLoading: isLoadingSenderParcels,
+    isError: isErrorSenderParcels,
+    error: errorSenderParcels,
+  } = useGetSenderParcelsQuery({
     ...currentQuery,
   });
 
@@ -435,6 +443,23 @@ export default function SenderParcelTable() {
       columnVisibility,
     },
   });
+
+  if (isLoadingSenderParcels) {
+    return <Loading message="Loading parcels data..." />;
+  }
+
+  if (!isLoadingSenderParcels && isErrorSenderParcels) {
+    return <Error message={errorSenderParcels?.message} />;
+  }
+
+  if (
+    !isLoadingSenderParcels &&
+    !isErrorSenderParcels &&
+    senderParcels &&
+    senderParcels?.data.length === 0
+  ) {
+    return <Information message="No parcel data available" />;
+  }
 
   return (
     <div className="space-y-4">

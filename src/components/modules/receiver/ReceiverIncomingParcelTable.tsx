@@ -31,6 +31,9 @@ import {
 import { useEffect, useId, useState } from "react";
 
 import DeleteConfirmation from "@/components/DeleteConformation";
+import Error from "@/components/Error";
+import Information from "@/components/Information";
+import Loading from "@/components/Loading";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,7 +97,6 @@ const columns: ColumnDef<IParcel>[] = [
     cell: ({ row }) => {
       const name = row?.original?.sender?.name;
       const initials = getNameInitials(name);
-      console.log(name);
 
       return (
         <div className="flex items-start gap-3">
@@ -331,7 +333,12 @@ export default function ReceiverIncomingParcelTable() {
     currentStatus: statusFilter.length > 0 ? [...statusFilter] : undefined,
   };
 
-  const { data: incomingParcels } = useGetIncomingParcelsQuery({
+  const {
+    data: incomingParcels,
+    isLoading: isLoadingIncomingParcels,
+    isError: isErrorIncomingParcels,
+    error: errorIncomingParcels,
+  } = useGetIncomingParcelsQuery({
     ...currentQuery,
   });
 
@@ -399,6 +406,23 @@ export default function ReceiverIncomingParcelTable() {
       columnVisibility,
     },
   });
+
+  if (isLoadingIncomingParcels) {
+    return <Loading message="Loading parcels data..." />;
+  }
+
+  if (!isLoadingIncomingParcels && isErrorIncomingParcels) {
+    return <Error message={errorIncomingParcels?.message} />;
+  }
+
+  if (
+    !isLoadingIncomingParcels &&
+    !isErrorIncomingParcels &&
+    incomingParcels &&
+    incomingParcels?.data.length === 0
+  ) {
+    return <Information message="No parcel data available" />;
+  }
 
   return (
     <div className="space-y-4">

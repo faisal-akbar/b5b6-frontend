@@ -2,6 +2,7 @@ import App from "@/App";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import NotFound from "@/components/NotFound";
 import About from "@/pages/About";
+import ViewParcelDetails from "@/pages/admin/parcels/ViewParcelDetails";
 import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
 import Features from "@/pages/Features";
@@ -68,6 +69,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to={ADMIN_DEFAULT_ROUTE} /> },
       ...generateRoutes(adminSidebarItems),
+      { Component: ViewParcelDetails, path: ":id/details" },
     ],
   },
   {

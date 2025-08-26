@@ -1,37 +1,24 @@
+import Error from "@/components/Error";
+import Information from "@/components/Information";
+import Loading from "@/components/Loading";
 import OverviewCards from "@/components/modules/admin/parcels/analytics/OverViewCards";
 import ParcelCharts from "@/components/modules/admin/parcels/analytics/ParcelsCharts";
 import { useGetParcelAnalyticsQuery } from "@/redux/features/parcel/parcelApi";
-import { Loader2 } from "lucide-react";
 
 function Analytics() {
-  const { data, isLoading, isError } = useGetParcelAnalyticsQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  });
+  const { data, isLoading, isError, error } =
+    useGetParcelAnalyticsQuery(undefined);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading analytics data...</p>
-        </div>
-      </div>
-    );
+    return <Loading message="Loading analytics data..." />;
   }
 
-  if (isError) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <div className="text-destructive text-lg font-medium">
-            Error loading analytics
-          </div>
-          <p className="text-muted-foreground">
-            Unable to load parcel statistics. Please try again later.
-          </p>
-        </div>
-      </div>
-    );
+  if (!isLoading && isError) {
+    return <Error message={error?.message} />;
+  }
+
+  if (!isLoading && !isError && data && !data?.data) {
+    return <Information message="No parcel data available" />;
   }
 
   return (

@@ -52,7 +52,7 @@ const TimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
               <div key={index} className="flex gap-4">
                 <div className="flex flex-col items-center">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    {getStatusIcon(item.status)}
+                    {getStatusIcon(item?.status)}
                   </div>
                   {index < statusLog.length - 1 && (
                     <div className="w-0.5 h-12 bg-muted mt-2"></div>
@@ -61,26 +61,26 @@ const TimeLine = ({ statusLog }: { statusLog: IStatusLog[] }) => {
                 <div className="flex-1 pb-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
                     <h4 className="font-semibold mb-2 md:mb-0">
-                      {item.status}
+                      {item?.status}
                     </h4>
                     <span className="text-sm text-muted-foreground">
                       {format(
-                        new Date(item.updatedAt).toLocaleString(),
+                        new Date(item?.updatedAt).toLocaleString(),
                         "PP h:mm a"
                       )}
                     </span>
                   </div>
-                  {item.location && (
+                  {item?.location && (
                     <p className="text-sm text-muted-foreground mb-1">
                       {item.location}
                     </p>
                   )}
-                  {item.updatedBy && (
+                  {item?.updatedBy && (
                     <p className="text-sm text-muted-foreground mb-1">
-                      Updated by: {item.updatedBy}
+                      Updated by: {item.updatedBy?.name}, {item.updatedBy?.role}
                     </p>
                   )}
-                  <p className="text-sm">{item.note}</p>
+                  <p className="text-sm">{item?.note}</p>
                 </div>
               </div>
             ))}

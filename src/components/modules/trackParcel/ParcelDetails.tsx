@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SelectSeparator } from "@/components/ui/select";
 import { IParcelTrackData, IResponse } from "@/types";
 import { getStatusColor } from "@/utils/getStatusColor";
 import { format } from "date-fns";
@@ -43,7 +44,7 @@ const ParcelDetails = ({ data }: { data: IResponse<IParcelTrackData> }) => {
               <CardContent className="space-y-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Tracking ID</p>
-                  <p className="font-mono font-bold text-lg">{trackingId}</p>
+                  <p className="font-mono font-bold text-md">{trackingId}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Status</p>
@@ -76,7 +77,7 @@ const ParcelDetails = ({ data }: { data: IResponse<IParcelTrackData> }) => {
             </Card>
 
             {/* Address Information */}
-            <Card className="p-6 shadow-lg border-0 bg-gradient-to-br from-card to-card/50 mt-6">
+            <Card className="p-6 shadow-lg border-0 bg-gradient-to-br from-card to-card/50 mt-6 text-sm">
               <CardHeader>
                 <CardTitle>Address Information</CardTitle>
               </CardHeader>
@@ -87,6 +88,7 @@ const ParcelDetails = ({ data }: { data: IResponse<IParcelTrackData> }) => {
                   </p>
                   <p className="font-semibold">{pickupAddress}</p>
                 </div>
+                <SelectSeparator />
                 <div>
                   <p className="text-sm text-muted-foreground">
                     Delivery Address
