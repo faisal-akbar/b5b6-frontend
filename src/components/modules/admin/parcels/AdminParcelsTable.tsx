@@ -557,6 +557,284 @@ export default function AdminParcelsTable() {
     return <Error />;
   }
 
+  const content = (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        {/* Filter by tracking id */}
+        <div className="relative">
+          <Input
+            // id={id}
+            className="peer ps-9 pe-9"
+            placeholder="Search..."
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+          />
+          <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+            <SearchIcon size={16} />
+          </div>
+          {searchTerm && (
+            <button
+              className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Clear input"
+              onClick={handleClearSearch}
+            >
+              <XIcon size={16} aria-hidden="true" />
+            </button>
+          )}
+          {
+            <button
+              onClick={handleSearch}
+              className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Submit search"
+              type="submit"
+            >
+              <ArrowRightIcon size={16} aria-hidden="true" />
+            </button>
+          }
+          <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
+            <Tooltip>
+              <TooltipTrigger>
+                <InfoIcon size={14} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Search by tracking ID or address</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+
+        {/* Filter by status */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <FilterIcon
+                className="-ms-1 opacity-60"
+                size={16}
+                aria-hidden="true"
+              />
+              Status
+              {statusFilter.length > 0 && (
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                  {statusFilter.length}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
+                Filters
+              </div>
+              <div className="space-y-3">
+                {Object.values(ParcelStatus).map((value, i) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`status-${i}`}
+                      checked={statusFilter.includes(value)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleStatusChange(checked, value)
+                      }
+                    />
+                    <Label
+                      htmlFor={`status-${i}`}
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
+                      {value}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* Filter by parcel type */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <FilterIcon
+                className="-ms-1 opacity-60"
+                size={16}
+                aria-hidden="true"
+              />
+              Parcel Type
+              {typeFilter.length > 0 && (
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                  {typeFilter.length}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
+                Filters
+              </div>
+              <div className="space-y-3">
+                {Object.values(ParcelType).map((value, i) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`type-${i}`}
+                      checked={typeFilter.includes(value)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleTypeChange(checked, value)
+                      }
+                    />
+                    <Label
+                      htmlFor={`type-${i}`}
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
+                      {value.charAt(0).toUpperCase() + value.slice(1)}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* Filter by shipping type */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <FilterIcon
+                className="-ms-1 opacity-60"
+                size={16}
+                aria-hidden="true"
+              />
+              Shipping Type
+              {shippingTypeFilter.length > 0 && (
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                  {shippingTypeFilter.length}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
+                Filters
+              </div>
+              <div className="space-y-3">
+                {Object.values(ShippingType).map((value, i) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`shippingType-${i}`}
+                      checked={shippingTypeFilter.includes(value)}
+                      onCheckedChange={(checked: boolean) =>
+                        handleShippingTypeChange(checked, value)
+                      }
+                    />
+                    <Label
+                      htmlFor={`shippingType-${i}`}
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
+                      {value.charAt(0).toUpperCase() + value.slice(1)}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* Filter by blocked parcels */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <FilterIcon
+                className="-ms-1 opacity-60"
+                size={16}
+                aria-hidden="true"
+              />
+              Blocked
+              {blockedParcelFilter !== undefined && (
+                <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
+                  {blockedParcelFilter ? "Yes" : "No"}
+                </span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto min-w-36 p-3" align="start">
+            <div className="space-y-3">
+              <div className="text-muted-foreground text-xs font-medium">
+                Filters
+              </div>
+              <div className="space-y-3">
+                {["Yes", "No"].map((value, i) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`blocking-${i}`}
+                      checked={blockedParcelFilter === (value === "Yes")}
+                      onCheckedChange={(checked: boolean) =>
+                        handleBlockedParcelChange(checked, value === "Yes")
+                      }
+                    />
+                    <Label
+                      htmlFor={`blocking-${i}`}
+                      className="flex grow justify-between gap-2 font-normal"
+                    >
+                      {value}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* Toggle columns visibility */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Columns3Icon
+                className="-ms-1 opacity-60"
+                size={16}
+                aria-hidden="true"
+              />
+              View
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                    onSelect={(event) => event.preventDefault()}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex items-center gap-3">
+        {/* Send parcel button */}
+        <Button
+          onClick={() => setOpen(true)}
+          className="ml-auto"
+          variant="outline"
+        >
+          <PlusIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
+          Create Parcel
+        </Button>
+        <AdminCreateParcelDialog open={open} onOpenChange={setOpen} />
+      </div>
+    </div>
+  );
+
   if (
     !isLoadingParcels &&
     !isErrorParcels &&
@@ -565,22 +843,7 @@ export default function AdminParcelsTable() {
   ) {
     return (
       <>
-        <div className="flex items-center gap-3">
-          {/* Send parcel button */}
-          <Button
-            onClick={() => setOpen(true)}
-            className="ml-auto"
-            variant="outline"
-          >
-            <PlusIcon
-              className="-ms-1 opacity-60"
-              size={16}
-              aria-hidden="true"
-            />
-            Create Parcel
-          </Button>
-          <AdminCreateParcelDialog open={open} onOpenChange={setOpen} />
-        </div>
+        {content}
         <Information message="No parcel data available" />
       </>
     );
@@ -589,285 +852,7 @@ export default function AdminParcelsTable() {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {/* Filter by tracking id */}
-          <div className="relative">
-            <Input
-              // id={id}
-              className="peer ps-9 pe-9"
-              placeholder="Search..."
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch();
-                }
-              }}
-            />
-            <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-              <SearchIcon size={16} />
-            </div>
-            {searchTerm && (
-              <button
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-5 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Clear input"
-                onClick={handleClearSearch}
-              >
-                <XIcon size={16} aria-hidden="true" />
-              </button>
-            )}
-            {
-              <button
-                onClick={handleSearch}
-                className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Submit search"
-                type="submit"
-              >
-                <ArrowRightIcon size={16} aria-hidden="true" />
-              </button>
-            }
-            <div className="absolute -inset-y-4 -start-2 text-muted-foreground/80">
-              <Tooltip>
-                <TooltipTrigger>
-                  <InfoIcon size={14} />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Search by tracking ID or address</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-
-          {/* Filter by status */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                Status
-                {statusFilter.length > 0 && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {statusFilter.length}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-36 p-3" align="start">
-              <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">
-                  Filters
-                </div>
-                <div className="space-y-3">
-                  {Object.values(ParcelStatus).map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`status-${i}`}
-                        checked={statusFilter.includes(value)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleStatusChange(checked, value)
-                        }
-                      />
-                      <Label
-                        htmlFor={`status-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
-                        {value}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-          {/* Filter by parcel type */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                Parcel Type
-                {typeFilter.length > 0 && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {typeFilter.length}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-36 p-3" align="start">
-              <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">
-                  Filters
-                </div>
-                <div className="space-y-3">
-                  {Object.values(ParcelType).map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`type-${i}`}
-                        checked={typeFilter.includes(value)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleTypeChange(checked, value)
-                        }
-                      />
-                      <Label
-                        htmlFor={`type-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
-                        {value.charAt(0).toUpperCase() + value.slice(1)}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-          {/* Filter by shipping type */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                Shipping Type
-                {shippingTypeFilter.length > 0 && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {shippingTypeFilter.length}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-36 p-3" align="start">
-              <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">
-                  Filters
-                </div>
-                <div className="space-y-3">
-                  {Object.values(ShippingType).map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`shippingType-${i}`}
-                        checked={shippingTypeFilter.includes(value)}
-                        onCheckedChange={(checked: boolean) =>
-                          handleShippingTypeChange(checked, value)
-                        }
-                      />
-                      <Label
-                        htmlFor={`shippingType-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
-                        {value.charAt(0).toUpperCase() + value.slice(1)}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-          {/* Filter by blocked parcels */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                Blocked
-                {blockedParcelFilter !== undefined && (
-                  <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
-                    {blockedParcelFilter ? "Yes" : "No"}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-36 p-3" align="start">
-              <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">
-                  Filters
-                </div>
-                <div className="space-y-3">
-                  {["Yes", "No"].map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`blocking-${i}`}
-                        checked={blockedParcelFilter === (value === "Yes")}
-                        onCheckedChange={(checked: boolean) =>
-                          handleBlockedParcelChange(checked, value === "Yes")
-                        }
-                      />
-                      <Label
-                        htmlFor={`blocking-${i}`}
-                        className="flex grow justify-between gap-2 font-normal"
-                      >
-                        {value}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-          {/* Toggle columns visibility */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Columns3Icon
-                  className="-ms-1 opacity-60"
-                  size={16}
-                  aria-hidden="true"
-                />
-                View
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                      onSelect={(event) => event.preventDefault()}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Send parcel button */}
-          <Button
-            onClick={() => setOpen(true)}
-            className="ml-auto"
-            variant="outline"
-          >
-            <PlusIcon
-              className="-ms-1 opacity-60"
-              size={16}
-              aria-hidden="true"
-            />
-            Create Parcel
-          </Button>
-          <AdminCreateParcelDialog open={open} onOpenChange={setOpen} />
-        </div>
-      </div>
+      {content}
 
       {/* Table */}
       <div className="bg-background rounded-md border overflow-auto">
@@ -1101,11 +1086,18 @@ function RowActions({ row }: { row: Row<IParcel> }) {
     data: z.infer<typeof updateStatusPersonnelSchema>
   ) => {
     try {
+      console.log("Updating parcel status", data);
       await updateStatusAndPersonnel({
         id: row.original?._id,
         data: {
           ...data,
           currentStatus: data.currentStatus as ParcelStatus | undefined,
+          currentLocation: data.currentLocation
+            ? data.currentLocation
+            : undefined,
+          deliveryPersonnelId: data.deliveryPersonnelId
+            ? data.deliveryPersonnelId
+            : undefined,
         },
       }).unwrap();
 
@@ -1118,7 +1110,7 @@ function RowActions({ row }: { row: Row<IParcel> }) {
 
   useEffect(() => {
     if (isError) {
-      toast.error("Failed to cancel parcel", {
+      toast.error("Failed to update parcel status", {
         description: (error as any)?.data?.message,
       });
     }

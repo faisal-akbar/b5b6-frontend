@@ -49,6 +49,7 @@ export interface IParcel {
   createdAt: Date;
   updatedAt: Date;
   deliveryPersonnel?: string[];
+  deliveryPersonnelId?: string; // just for form
   isBlocked?: boolean;
 }
 
