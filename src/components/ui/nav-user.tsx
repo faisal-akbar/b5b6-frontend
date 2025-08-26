@@ -32,12 +32,9 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
 
-  const [logout, { isSuccess, isLoading, isError, error }] =
-    useLogoutMutation();
+  const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  console.log({ isSuccess, isLoading, isError, error });
 
   const handleLogout = async () => {
     try {
