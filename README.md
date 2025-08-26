@@ -67,10 +67,6 @@ npm run dev
 email: "super@gmail.com",
 password: "12345678"
 
-// ADMIN
-email: "admin@parcel.com",
-password: "admin123"
-
 // SENDER
 email: "john.sender@parcel.com",
 password: "sender123"
@@ -78,6 +74,10 @@ password: "sender123"
 // RECEIVER
 email: "bob.receiver@parcel.com",
  password: "receiver123",
+
+ // ADMIN
+email: "admin@parcel.com",
+password: "Ph@12345678"
 ```
 
 ---
