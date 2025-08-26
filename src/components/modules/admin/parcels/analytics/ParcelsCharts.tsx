@@ -1,28 +1,11 @@
+import { IAnalyticsData } from "@/types";
 import DeliveryStatusBarChart from "./DeliveryStatysBarChart";
 import ShipmentBarChart from "./ShipmentBarChart";
 import ShippingTypeChart from "./ShippingTypeChart";
 import TypePieChart from "./TypePieChart";
 
-interface AnalyticsData {
-  totalParcel?: number;
-  totalParcelByStatus?: Array<{
-    _id: string;
-    count: number;
-  }>;
-  parcelCreatedInLast7Days?: number;
-  parcelCreatedInLast30Days?: number;
-  parcelPerType?: Array<{
-    _id: string;
-    count: number;
-  }>;
-  parcelPerShippingType?: Array<{
-    _id: string;
-    count: number;
-  }>;
-}
-
 interface ParcelChartsProps {
-  data?: AnalyticsData;
+  data?: IAnalyticsData;
 }
 
 function ParcelCharts({ data }: ParcelChartsProps) {

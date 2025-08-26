@@ -1,10 +1,17 @@
 import { baseApi } from "@/redux/api/baseApi";
-import { IParcel, IParcelParams, IParcelTrackData, IResponse } from "@/types";
+import {
+  IAnalyticsData,
+  IParcel,
+  IParcelParams,
+  IParcelTrackData,
+  IResponse,
+} from "@/types";
+import { StatusLog } from "@/types/sender-parcel-type";
 
 export const parcelApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Sender
-    createParcel: builder.mutation({
+    createParcel: builder.mutation<IResponse<IParcel>, Partial<IParcel>>({
       query: (data) => ({
         url: "/parcels",
         method: "POST",
@@ -27,7 +34,7 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["SENDER_PARCEL"],
     }),
-    getParcelStatusLog: builder.query({
+    getParcelStatusLog: builder.query<IResponse<StatusLog[]>, string>({
       query: (id) => ({
         url: `/parcels/${id}/status-log`,
         method: "GET",
@@ -80,7 +87,7 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       providesTags: ["RECEIVER_PARCEL"],
     }),
-    confirmParcelDelivery: builder.mutation({
+    confirmParcelDelivery: builder.mutation<unknown, string>({
       query: (id) => ({
         url: `/parcels/confirm/${id}`,
         method: "PATCH",
@@ -96,14 +103,17 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       providesTags: ["ALL_PARCEL"],
     }),
-    getParcelById: builder.query({
+    getParcelById: builder.query<IResponse<IParcel>, string>({
       query: (id) => ({
         url: `/parcels/${id}`,
         method: "GET",
       }),
       providesTags: ["ALL_PARCEL"],
     }),
-    updateStatusAndPersonnel: builder.mutation({
+    updateStatusAndPersonnel: builder.mutation<
+      unknown,
+      { id: string; data: Partial<IParcel> }
+    >({
       query: ({ id, data }) => ({
         url: `/parcels/${id}/delivery-status`,
         method: "PATCH",
@@ -111,7 +121,10 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["ALL_PARCEL"],
     }),
-    blockParcel: builder.mutation({
+    blockParcel: builder.mutation<
+      unknown,
+      { id: string; data: Partial<IParcel> }
+    >({
       query: ({ id, data }) => ({
         url: `/parcels/${id}/block-status`,
         method: "PATCH",
@@ -119,7 +132,7 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["ALL_PARCEL"],
     }),
-    adminCreateParcel: builder.mutation({
+    adminCreateParcel: builder.mutation<IResponse<IParcel>, Partial<IParcel>>({
       query: (data) => ({
         url: "/parcels/create-parcel",
         method: "POST",
@@ -127,7 +140,7 @@ export const parcelApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["ALL_PARCEL"],
     }),
-    getParcelAnalytics: builder.query({
+    getParcelAnalytics: builder.query<IResponse<IAnalyticsData>, void>({
       query: () => ({
         url: "/stats/parcels",
         method: "GET",

@@ -30,4 +30,22 @@ export interface ISidebarItem {
   }[];
 }
 
+export interface IAnalyticsData {
+  totalParcel?: number;
+  totalParcelByStatus?: Array<{
+    _id: string;
+    count: number;
+  }>;
+  parcelCreatedInLast7Days?: number;
+  parcelCreatedInLast30Days?: number;
+  parcelPerType?: Array<{
+    _id: string;
+    count: number;
+  }>;
+  parcelPerShippingType?: Array<{
+    _id: string;
+    count: number;
+  }>;
+}
+
 export type TRole = keyof typeof Role;

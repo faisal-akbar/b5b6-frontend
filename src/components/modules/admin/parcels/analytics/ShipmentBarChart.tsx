@@ -22,7 +22,7 @@ import {
 const chartConfig = {
   created: {
     label: "Created",
-    color: "#10b981", // emerald-500 for shipment creation
+    color: "#10b981", // emerald-500
   },
 };
 

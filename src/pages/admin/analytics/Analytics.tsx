@@ -34,8 +34,6 @@ function Analytics() {
     );
   }
 
-  console.log("Parcel Statistics:", isLoading, isError, data);
-
   return (
     <div className="space-y-8 p-6">
       <div className="space-y-2">

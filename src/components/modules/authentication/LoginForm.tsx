@@ -15,7 +15,8 @@ import {
   RECEIVER_DEFAULT_ROUTE,
   SENDER_DEFAULT_ROUTE,
 } from "@/routes/constants";
-import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
+import { IError, ILogin } from "@/types";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -32,7 +33,7 @@ export function LoginForm({
     },
   });
   const [login] = useLoginMutation();
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const onSubmit: SubmitHandler<ILogin> = async (data) => {
     try {
       const res = await login(data).unwrap();
       console.log(res);
@@ -51,9 +52,7 @@ export function LoginForm({
         }
         return;
       }
-    } catch (err) {
-      console.error(err);
-
+    } catch (err: IError | unknown) {
       if (err?.data?.message === "User does not exist") {
         toast.error("User Not Found");
       }
