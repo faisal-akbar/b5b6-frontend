@@ -60,7 +60,7 @@ npm run dev
 
 ---
 
-### Email and password for testing dummy users:
+## 🔐 Email and password for testing dummy users:
 
 ```
 // SUPER_ADMIN
